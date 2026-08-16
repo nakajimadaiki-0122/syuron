@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /Users/daiki/Desktop/修論/handover && mkdir -p results/_baseline_2026-08-09 && cp results/*.json results/*.npz results/_baseline_2026-08-09/ && ls results/_baseline_2026-08-09/)",
+      "Bash(.venv/bin/python -c \"import pymupdf; print\\('pymupdf', pymupdf.__doc__\\)\")",
+      "Bash(SP=/private/tmp/claude-501/-Users-daiki-Desktop---/f95f6213-8ec0-4275-85d5-927310137358/scratchpad handover/.venv/bin/python -)",
+      "Bash(.venv/bin/python scripts/03_compare.py --fwd results/flow_tesla_channel_fwd_Re100.npz --rev results/flow_tesla_channel_rev_Re100.npz --out figures/fwd_vs_rev.png)",
+      "Bash(./.venv/bin/python scripts/02_run_flow.py --dxf data/tesla_channel.dxf --case fwd --Re 100)",
+      "Bash(./.venv/bin/python scripts/02_run_flow.py --dxf data/tesla_channel.dxf --case rev --Re 100)",
+      "Bash(./.venv/bin/python scripts/02_run_flow.py --dxf data/straight_channel.dxf --case fwd --Re 100)",
+      "Bash(./.venv/bin/python scripts/03_compare.py --fwd results/flow_tesla_channel_fwd_Re100.npz --rev results/flow_tesla_channel_rev_Re100.npz --out figures/fwd_vs_rev.png)",
+      "Bash(./.venv/bin/python -c ' *)",
+      "Bash(./.venv/bin/python -)",
+      "Bash(./.venv/bin/python scripts/01_validate_solver.py)",
+      "Bash(rm -f results/ck_straight_channel_fwd_Re300.npy)",
+      "Bash(timeout 300 ./.venv/bin/python scripts/02_run_flow.py --dxf data/straight_channel.dxf --case fwd --Re 300 --iters 12000)",
+      "Bash(./.venv/bin/python scripts/02_run_flow.py --dxf data/straight_channel.dxf --case fwd --Re 300 --iters 12000)",
+      "Bash(./.venv/bin/python scripts/05_loop_junction_angle.py data/tesla_channel.dxf)",
+      "Bash(./.venv/bin/python scripts/06_compare_junction_gamboa.py)",
+      "Bash(awk '/it=/{print $2, $3, $4}' /private/tmp/claude-501/-Users-daiki-Desktop---/f95f6213-8ec0-4275-85d5-927310137358/scratchpad/u_fwd_100_c24.log)",
+      "Bash(./.venv/bin/python scripts/07_uncertainty.py)",
+      "Bash(sort -k2 -k3)",
+      "Bash(SP=/private/tmp/claude-501/-Users-daiki-Desktop---/f95f6213-8ec0-4275-85d5-927310137358/scratchpad ./.venv/bin/python -)"
+    ],
+    "additionalDirectories": [
+      "/Users/daiki/Desktop/修論/results"
+    ]
+  }
+}
