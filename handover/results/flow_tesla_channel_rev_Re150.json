@@ -1,0 +1,30 @@
+{
+ "tag": "tesla_channel_rev_Re150",
+ "dxf": "data/tesla_channel.dxf",
+ "case": "rev",
+ "Re": 150.0,
+ "cells_per_mm": 12,
+ "U_lattice": 0.05,
+ "nu_lattice": 0.008000000000000002,
+ "tau_p": 0.524,
+ "Mach": 0.08660254037844388,
+ "wall_time_s": 278.7,
+ "dp_lattice": NaN,
+ "dp_Pa": NaN,
+ "area_polygon_mm2": 57.15575762170871,
+ "area_raster_mm2": 57.270833333333336,
+ "error_pct": 0.20133704181872158,
+ "fluid_cells": 8247,
+ "solid_cells": 8481,
+ "shape": [
+  408,
+  41
+ ],
+ "phi_loop_mean": NaN,
+ "phi_loop_max": NaN,
+ "mdot_in": NaN,
+ "mdot_out": NaN,
+ "mass_imbalance_pct": NaN,
+ "volflux_imbalance_pct": NaN,
+ "u_loop_over_u_main": NaN
+}

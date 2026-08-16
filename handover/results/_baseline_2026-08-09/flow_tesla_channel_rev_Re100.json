@@ -1,0 +1,29 @@
+{
+ "tag": "tesla_channel_rev_Re100",
+ "dxf": "data/tesla_channel.dxf",
+ "case": "rev",
+ "Re": 100.0,
+ "cells_per_mm": 12,
+ "U_lattice": 0.05,
+ "nu_lattice": 0.012000000000000002,
+ "tau_p": 0.536,
+ "Mach": 0.08660254037844388,
+ "wall_time_s": 124.4,
+ "dp_lattice": 0.017081426430795965,
+ "dp_Pa": 12.525320221179825,
+ "area_polygon_mm2": 57.15575762170871,
+ "area_raster_mm2": 57.270833333333336,
+ "error_pct": 0.20133704181872158,
+ "fluid_cells": 8247,
+ "solid_cells": 8481,
+ "shape": [
+  408,
+  41
+ ],
+ "phi_loop_mean": 0.18818942253983742,
+ "phi_loop_max": 0.28697420194324286,
+ "mdot_in": 0.6016649234398957,
+ "mdot_out": 0.6324846543942325,
+ "mass_imbalance_pct": 5.12240779770429,
+ "u_loop_over_u_main": 0.22519117936876623
+}

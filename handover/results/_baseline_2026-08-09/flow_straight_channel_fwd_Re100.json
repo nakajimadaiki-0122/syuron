@@ -1,0 +1,29 @@
+{
+ "tag": "straight_channel_fwd_Re100",
+ "dxf": "data/straight_channel.dxf",
+ "case": "fwd",
+ "Re": 100.0,
+ "cells_per_mm": 12,
+ "U_lattice": 0.05,
+ "nu_lattice": 0.012000000000000002,
+ "tau_p": 0.536,
+ "Mach": 0.08660254037844388,
+ "wall_time_s": 40.0,
+ "dp_lattice": 0.021610991674647695,
+ "dp_Pa": 15.846720537003781,
+ "area_polygon_mm2": 34.0,
+ "area_raster_mm2": 34.0,
+ "error_pct": 0.0,
+ "fluid_cells": 4896,
+ "solid_cells": 1632,
+ "shape": [
+  408,
+  16
+ ],
+ "phi_loop_mean": NaN,
+ "phi_loop_max": NaN,
+ "mdot_in": 0.6016644475483622,
+ "mdot_out": 0.6405528727796724,
+ "mass_imbalance_pct": 6.463474016085073,
+ "u_loop_over_u_main": NaN
+}

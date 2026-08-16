@@ -1,0 +1,90 @@
+{
+ "shapes": [
+  {
+   "name": "Gamboa optimized",
+   "theta_design": 161.60739838260656,
+   "theta_measured": 161.60739838260656,
+   "theta_err": 0.0,
+   "width_min": 0.9999967608262967,
+   "width_max": 1.0499559146430901,
+   "width_spread_pct": 4.995915381679339,
+   "center": [
+    1.980461244917034,
+    2.85
+   ],
+   "loop_x": [
+    -0.3695387550829661,
+    7.246275708232836
+   ]
+  },
+  {
+   "name": "Gamboa reference",
+   "theta_design": 98.5307656099482,
+   "theta_measured": 98.53076560994822,
+   "theta_err": 1.4210854715202004e-14,
+   "width_min": 0.9999985013444552,
+   "width_max": 1.0111874208078344,
+   "width_spread_pct": 1.1188919463379188,
+   "center": [
+    3.652968552019583,
+    3.0
+   ],
+   "loop_x": [
+    1.152968552019583,
+    9.688502457952321
+   ]
+  },
+  {
+   "name": "parametric theta=120.0",
+   "theta_design": 120.0,
+   "theta_measured": 120.0,
+   "theta_err": 0.0,
+   "width_min": 0.999997918663771,
+   "width_max": 1.0499220278635653,
+   "width_spread_pct": 4.992410919979429,
+   "center": [
+    2.956773132595621,
+    2.85
+   ],
+   "loop_x": [
+    0.6067731325956207,
+    8.222587595911424
+   ]
+  },
+  {
+   "name": "parametric theta=90.0",
+   "theta_design": 90.0,
+   "theta_measured": 90.0,
+   "theta_err": 0.0,
+   "width_min": 0.9999985952655823,
+   "width_max": 1.0000000312438577,
+   "width_spread_pct": 0.00014359782753992079,
+   "center": [
+    3.95,
+    2.85
+   ],
+   "loop_x": [
+    1.6,
+    9.215814463315802
+   ]
+  },
+  {
+   "name": "parametric theta=47.4",
+   "theta_design": 47.4,
+   "theta_measured": 47.39999999999998,
+   "theta_err": -2.1316282072803006e-14,
+   "width_min": 0.9999993285307878,
+   "width_max": 1.000000031243858,
+   "width_spread_pct": 7.027130701775519e-05,
+   "center": [
+    6.9534494263163165,
+    2.85
+   ],
+   "loop_x": [
+    4.603449426316317,
+    12.219263889632117
+   ]
+  }
+ ],
+ "periodic_ok": true
+}
