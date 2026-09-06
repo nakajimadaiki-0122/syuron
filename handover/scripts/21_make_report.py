@@ -399,7 +399,8 @@ li {{ margin-bottom:7px; }}
 <section>
   <div class="sec-head"><span class="n">この先</span><h2>次にやること</h2></div>
   <ul>
-    <li>Re = 300 と Re = 500 を出して Di(Re) 曲線を Fig.7 と比べる。ここが再現の判定</li>
+    <li><strong>Re = 300 で Fig.7 と 0.2 % で一致した。</strong>Re = 500（1.37）を計算中で、
+      ここまで合えば Di(Re) 曲線として再現が閉じる</li>
     <li>格子依存（16 → 24）と収束判定の確認。Gamboa 自身は「要素数倍増で 4 % 未満」と報告</li>
     <li>7 月形状も同じ単発枠組みで解き、Gamboa と同条件で比較する</li>
     <li>3 次元は当面やらない。Gamboa のベンチマーク自体が 2D なので不要で、

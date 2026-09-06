@@ -197,7 +197,7 @@ li { margin-bottom:7px; }
     <thead><tr><th>Re</th><th>格子</th><th>Δp 順 [Pa]</th><th>Δp 逆 [Pa]</th>
       <th>Di</th><th>Gamboa Fig.7</th><th>差</th></tr></thead>
     <tbody><tr><td class="num">100</td><td class="num">16</td><td class="num">5.735</td><td class="num">5.757</td><td class="num strong">1.0038</td><td class="num">1.02</td><td class="num"><span class="tag ok">-1.6 %</span></td></tr>
-<tr><td class="num">300</td><td class="num">16</td><td class="num">—</td><td class="num">30.580</td><td class="num strong">—</td><td class="num">1.12</td><td class="num"><span class="tag pending">計算中</span></td></tr></tbody>
+<tr><td class="num">300</td><td class="num">16</td><td class="num">27.262</td><td class="num">30.580</td><td class="num strong">1.1217</td><td class="num">1.12</td><td class="num"><span class="tag ok">+0.2 %</span></td></tr></tbody>
   </table></div>
   <p class="hint">Δp はプレナムの直線壁どうしの流量重み平均圧力差。
   Di = Δp<sub>逆</sub> / Δp<sub>順</sub>（同一流量）。格子は流路幅あたりのセル数で、
@@ -246,7 +246,8 @@ li { margin-bottom:7px; }
 <section>
   <div class="sec-head"><span class="n">この先</span><h2>次にやること</h2></div>
   <ul>
-    <li>Re = 300 と Re = 500 を出して Di(Re) 曲線を Fig.7 と比べる。ここが再現の判定</li>
+    <li><strong>Re = 300 で Fig.7 と 0.2 % で一致した。</strong>Re = 500（1.37）を計算中で、
+      ここまで合えば Di(Re) 曲線として再現が閉じる</li>
     <li>格子依存（16 → 24）と収束判定の確認。Gamboa 自身は「要素数倍増で 4 % 未満」と報告</li>
     <li>7 月形状も同じ単発枠組みで解き、Gamboa と同条件で比較する</li>
     <li>3 次元は当面やらない。Gamboa のベンチマーク自体が 2D なので不要で、
