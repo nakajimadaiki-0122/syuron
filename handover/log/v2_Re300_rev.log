@@ -1,0 +1,11 @@
+================================================================================
+ Gamboa optimized 単発モデル（プレナム込み）  Re = 300.0, cpm = 16
+================================================================================
+  領域 288 x 266 セル = 17.94 x 16.56 w_v, 流体率 34.2 %
+  [rev] 288 x 266, 流体 26219 セル, 入口 160 / 出口 160 セル, U_in = 0.00500, nu = 0.00533, tau_p = 0.5160
+    it=  20000 res=3.42e-04 mdot in/out=8.11064e-01/8.10631e-01 dp=4.611827e-03
+    it=  40000 res=8.91e-05 mdot in/out=8.11114e-01/8.11098e-01 dp=4.632919e-03
+    it=  60000 res=8.86e-05 mdot in/out=8.11116e-01/8.11117e-01 dp=4.633717e-03
+  [rev] dp = 4.633682e-03 (格子) = 30.5797 Pa, 収束 True it=62501 res=5.77e-05 2090s
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re300_cpm16_rev_fields.npz
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re300_cpm16_rev.json  （片方向のみ。Di は未算出）

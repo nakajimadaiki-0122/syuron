@@ -1,0 +1,54 @@
+{
+ "wv_mm": 1.0,
+ "depth_mm": 1.0,
+ "wall_mm": 1.0,
+ "margin_mm": 2.0,
+ "port_mm": 2.0,
+ "ports": [
+  [
+   -2.9749371855330997,
+   0.0
+  ],
+  [
+   10.879203511671518,
+   -4.297654867938684
+  ]
+ ],
+ "plate_extent": [
+  -7.4749371855331,
+  18.270332191719323,
+  -11.497587143787923,
+  7.199998418981136
+ ],
+ "models": [
+  {
+   "file": "gamboa_fluid_3d.stl",
+   "triangles": 5332,
+   "volume_mm3": 102.80016179759416,
+   "nonmanifold": 0,
+   "edges": 7998
+  },
+  {
+   "file": "gamboa_valve_only_fluid_3d.stl",
+   "triangles": 1488,
+   "volume_mm3": 24.269178033677917,
+   "nonmanifold": 0,
+   "edges": 2232
+  },
+  {
+   "file": "gamboa_plate_3d.stl",
+   "triangles": 6376,
+   "volume_mm3": 853.6679299239269,
+   "nonmanifold": 0,
+   "edges": 9564
+  },
+  {
+   "file": "gamboa_lid_3d.stl",
+   "triangles": 12,
+   "volume_mm3": 481.3743770177154,
+   "nonmanifold": 0,
+   "edges": 18
+  }
+ ],
+ "all_watertight": true
+}

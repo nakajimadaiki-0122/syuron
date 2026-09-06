@@ -1,0 +1,47 @@
+{
+ "cpm": 16,
+ "U": 0.05,
+ "L": 20.0,
+ "rows": [
+  {
+   "Re": 300.0,
+   "cpm": 16,
+   "L_wv": 20.0,
+   "nx": 320,
+   "nu": 0.005333333333333334,
+   "tau_p": 0.516,
+   "converged": true,
+   "iters": 66001,
+   "residual": 0.00016920328069815275,
+   "wall_s": 63.0,
+   "u_max_over_avg": 1.4890692079681913,
+   "Re_measured": 302.59838981244945,
+   "fRe": 96.74505615350348,
+   "fRe_corrected": 95.69358217734714,
+   "mdot_interior_spread": 3.084117602943174e-05
+  },
+  {
+   "Re": 400.0,
+   "cpm": 16,
+   "L_wv": 20.0,
+   "nx": 320,
+   "nu": 0.004,
+   "tau_p": 0.512,
+   "converged": true,
+   "iters": 76001,
+   "residual": 0.0002244305799296931,
+   "wall_s": 74.8,
+   "u_max_over_avg": 1.489079086518472,
+   "Re_measured": 402.78903124828986,
+   "fRe": 96.72927897277322,
+   "fRe_corrected": 95.69068070552056,
+   "mdot_interior_spread": 4.757276639026913e-05
+  },
+  {
+   "Re": 500.0,
+   "diverged": true,
+   "message": "diverged at it=11500"
+  }
+ ],
+ "passed": false
+}

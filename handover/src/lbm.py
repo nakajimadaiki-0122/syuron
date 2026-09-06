@@ -291,3 +291,218 @@ def solve_flow(mask, nu, U, iters=40000, tol=2e-6, report=None, f0=None):
     if not converged and report:
         report(-1, float("nan"))
     return ux, uy, p, rho, f
+
+
+def _regularized(fcol, j, rho, ux, uy, unknown):
+    """正則化境界（Latt et al. 2008）で境界節点の 9 成分を再構成する。
+
+    Zou-He は tau が 0.5 に近いと不安定になる（2026-09-06 に確認:
+    tau_p = 0.5096 の Re = 500 では、放物線入口の完全発達流でも
+    it = 11500 で発散した）。正則化 BC は非平衡部を応力テンソルへ射影して
+    捨てるので、低 tau でも安定である。
+
+    手順
+      1. 既知成分から f_neq = f - f_eq(rho, u) を作る
+      2. 未知成分の f_neq は**対向成分から取る**（非平衡部のバウンスバック）
+      3. Pi_ab = sum_i c_ia c_ib f_neq_i
+      4. f_i = f_eq_i + w_i/(2 cs^4) * (c_ia c_ib - cs^2 delta_ab) Pi_ab
+
+    fcol     : (9, n) 境界列の分布関数（この場で書き換える）
+    unknown  : 未知成分の添字。西面なら [1,5,8]、東面なら [3,6,7]
+    """
+    usq = ux ** 2 + uy ** 2
+    feq = np.empty((9, len(j)))
+    for k in range(9):
+        cu = EX[k] * ux + EY[k] * uy
+        feq[k] = WT[k] * rho * (1 + cu / CS2 + cu ** 2 / (2 * CS2 ** 2)
+                                - usq / (2 * CS2))
+    fneq = fcol[:, j] - feq
+    for k in unknown:                      # 非平衡部のバウンスバック
+        fneq[k] = fneq[OPP[k]]
+    Pxx = (fneq * (EX ** 2)[:, None]).sum(0)
+    Pyy = (fneq * (EY ** 2)[:, None]).sum(0)
+    Pxy = (fneq * (EX * EY)[:, None]).sum(0)
+    for k in range(9):
+        Q = ((EX[k] ** 2 - CS2) * Pxx + 2.0 * EX[k] * EY[k] * Pxy
+             + (EY[k] ** 2 - CS2) * Pyy)
+        fcol[k, j] = feq[k] + WT[k] / (2.0 * CS2 ** 2) * Q
+
+
+def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
+                  ramp=5000, report=None, f0=None, rho_out=1.0,
+                  ckpt=None, ckpt_every=50000, dp_tol=1e-5, bc="zouhe",
+                  dp_window=10000):
+    """入口一様流速・出口定圧で解く（Gamboa の単発モデル用）。
+
+    既存の `solve_flow` との違い
+    ---------------------------
+    1. 入口分布を**一様流速**にできる（Gamboa 2.2 節の条件）
+    2. 入口・出口とも **Zou-He** に置き換えた。`solve_flow` の非平衡外挿は
+       Re >= 200 で発散する（README §8 B-6）
+    3. 入口速度を `ramp` 反復かけて 0 から立ち上げる（初期の音響衝撃を避ける）
+    4. チェックポイントを書ける（長時間計算の中断・再開用）
+
+    前提
+    ----
+    - i = 0 の列が入口面、i = nx-1 の列が出口面。どちらも**平らな鉛直面**であること
+      （プレナムの直線壁）。傾いた面には使えない
+    - y 方向の両端は固体（np.roll による周期化を防ぐ。README §8 B-1）
+
+    Parameters
+    ----------
+    mask   : (nx, ny) bool
+    nu     : 格子動粘性係数
+    U_in   : 入口面での流速（格子単位）。スカラなら一様、入口流体セル数と同じ長さの
+             配列なら任意分布（放物線など）を課せる。**流路の平均流速ではない**。
+             プレナム面が流路より広ければ U_in = U_channel * (流路幅 / 入口面の高さ)
+    tol    : 収束判定。check_every 反復あたりの max|Δux| / U_in がこれ未満
+    dp_tol : Δp の相対変化が **dp_window 反復のあいだ** これ未満なら収束とみなす。
+             直近 3 点だけで見ると一時的な平坦部で止まるので窓を取る
+    rho_out: 出口の密度（= 圧力）。1.0 が「ゼロゲージ圧」
+    bc     : "zouhe"（既定）| "regularized"。
+             **正則化 BC は本ソルバ（TRT, Lambda=1/4）では逆に不安定**
+             （2026-09-06 実測: Re=300, cpm=16 で Zou-He は安定、正則化は it=7000 で発散）。
+             TRT では非平衡部の奇数成分が omega_minus でゆっくりしか緩和せず、
+             正則化が応力テンソルへ射影する際にその成分を捨ててしまうためと考えられる
+
+    Returns
+    -------
+    ux, uy, p, rho, f, info
+    """
+    import os, time
+    nx, ny = mask.shape
+    if mask[:, 0].any() or mask[:, -1].any():
+        raise ValueError("y 方向の端に流体セルがある。pad を使うこと。")
+    solid = ~mask
+    tau_p = tau_from_nu(nu)
+    om_p = 1.0 / tau_p
+    tau_m = 0.5 + MAGIC / (tau_p - 0.5)
+    om_m = 1.0 / tau_m
+
+    U_in_arr = np.atleast_1d(np.asarray(U_in, float))
+    U_ref = float(np.mean(U_in_arr))
+    jin = np.where(mask[0])[0]
+    jout = np.where(mask[-1])[0]
+    if len(jin) == 0 or len(jout) == 0:
+        raise ValueError("入口列または出口列に流体セルがない")
+    # 角のセル（上下どちらかが固体）は Zou-He が成立しないので feq で埋める
+    if U_in_arr.size not in (1, len(jin)):
+        raise ValueError("U_in は定数か入口流体セル数と同じ長さの配列")
+    u_prof = (np.full(len(jin), U_in_arr[0]) if U_in_arr.size == 1
+              else U_in_arr.copy())
+    in_core = jin[(mask[0][jin - 1]) & (mask[0][np.minimum(jin + 1, ny - 1)])]
+    core_sel = np.isin(jin, in_core)
+    out_core = jout[(mask[-1][jout - 1]) & (mask[-1][np.minimum(jout + 1, ny - 1)])]
+
+    if f0 is not None:
+        f = f0.copy()
+    else:
+        f = np.zeros((9, nx, ny))
+        for k in range(9):
+            f[k] = WT[k]
+        f *= mask[None, :, :]
+
+    bb = [np.roll(np.roll(solid, EX[k], 0), EY[k], 1) for k in range(9)]
+    ux = np.zeros((nx, ny))
+    uy = np.zeros((nx, ny))
+    converged = False
+    hist = []
+    t0 = time.time()
+    it = 0
+    for it in range(iters):
+        rho = np.where(mask, np.maximum(f.sum(0), 1e-8), 1.0)
+        ux_n = (f * EX[:, None, None]).sum(0) / rho * mask
+        uy_n = (f * EY[:, None, None]).sum(0) / rho * mask
+
+        if it % check_every == 0 and it > 0:
+            if not np.isfinite(ux_n).all():
+                raise FloatingPointError(f"diverged at it={it}")
+            d = float(np.max(np.abs(ux_n - ux))) / max(U_ref, 1e-12)
+            mi = (rho * ux_n)[0, jin].sum()
+            mo = (rho * ux_n)[-1, jout].sum()
+            # Δp（入口面と出口面の流量重み平均圧力の差）。収束判定はこれで行う。
+            # 周期版が体積力 G の安定性で判定するのと同じ考え方（README §8 B-7）。
+            pp_ = rho * CS2
+            w1 = np.maximum(ux_n[1, mask[1]], 1e-12)
+            w2 = np.maximum(ux_n[-2, mask[-2]], 1e-12)
+            dp_now = float(np.average(pp_[1, mask[1]], weights=w1)
+                           - np.average(pp_[-2, mask[-2]], weights=w2))
+            hist.append((it, d, float(mi), float(mo), dp_now))
+            if report:
+                report(it, d, float(mi), float(mo), dp_now)
+            # **窓付き**で判定する。直近 3 点だけで見ると、Δp が一時的に
+            # 平らになったところで止まってしまう（2026-09-06 に実測。
+            # Re=100 は it=20000 -> 30000 で Δp がまだ 3.3 % 動いていた）。
+            ddp = float("inf")
+            nback = max(int(dp_window // check_every), 2)
+            if len(hist) > nback:
+                ddp = abs(dp_now / hist[-1 - nback][4] - 1.0)
+            if it > ramp * 2 and (d < tol or ddp < dp_tol):
+                ux, uy = ux_n, uy_n
+                converged = True
+                break
+        if ckpt and it % ckpt_every == 0 and it > 0:
+            np.save(ckpt, f)
+        ux, uy = ux_n, uy_n
+
+        usq = ux ** 2 + uy ** 2
+        feq = np.empty_like(f)
+        for k in range(9):
+            cu = EX[k] * ux + EY[k] * uy
+            feq[k] = WT[k] * rho * (1 + cu / CS2 + cu ** 2 / (2 * CS2 ** 2)
+                                    - usq / (2 * CS2))
+        fp = 0.5 * (f + f[OPP]); fm = 0.5 * (f - f[OPP])
+        ep = 0.5 * (feq + feq[OPP]); em = 0.5 * (feq - feq[OPP])
+        fpost = f - om_p * (fp - ep) - om_m * (fm - em)
+        fpost = np.where(mask[None], fpost, f)
+
+        fnew = np.empty_like(fpost)
+        for k in range(9):
+            fnew[k] = np.roll(np.roll(fpost[k], EX[k], 0), EY[k], 1)
+            fnew[k][bb[k]] = fpost[OPP[k]][bb[k]]
+        f = fnew * mask[None]
+
+        # ---- 入口: 速度 BC（西面、uy = 0）----
+        ramp_f = min(1.0, (it + 1) / max(ramp, 1))
+        u0 = u_prof * ramp_f
+        j = jin
+        f0_, f2, f4 = f[0, 0, j], f[2, 0, j], f[4, 0, j]
+        f3, f6, f7 = f[3, 0, j], f[6, 0, j], f[7, 0, j]
+        r_in = (f0_ + f2 + f4 + 2.0 * (f3 + f6 + f7)) / (1.0 - u0)
+        if bc == "zouhe":
+            f[1, 0, j] = f3 + (2.0 / 3.0) * r_in * u0
+            f[5, 0, j] = f7 - 0.5 * (f2 - f4) + (1.0 / 6.0) * r_in * u0
+            f[8, 0, j] = f6 + 0.5 * (f2 - f4) + (1.0 / 6.0) * r_in * u0
+        else:
+            _regularized(f[:, 0, :], j, r_in, u0, np.zeros_like(u0), (1, 5, 8))
+
+        # ---- 出口: 圧力 BC（東面、uy = 0）----
+        j = jout
+        f0_, f2, f4 = f[0, -1, j], f[2, -1, j], f[4, -1, j]
+        f1, f5, f8 = f[1, -1, j], f[5, -1, j], f[8, -1, j]
+        ue = -1.0 + (f0_ + f2 + f4 + 2.0 * (f1 + f5 + f8)) / rho_out
+        if bc == "zouhe":
+            f[3, -1, j] = f1 - (2.0 / 3.0) * rho_out * ue
+            f[7, -1, j] = f5 + 0.5 * (f2 - f4) - (1.0 / 6.0) * rho_out * ue
+            f[6, -1, j] = f8 - 0.5 * (f2 - f4) - (1.0 / 6.0) * rho_out * ue
+        else:
+            _regularized(f[:, -1, :], j, np.full(len(j), rho_out), ue,
+                         np.zeros_like(ue), (3, 6, 7))
+
+    rho = np.where(mask, np.maximum(f.sum(0), 1e-8), 1.0)
+    ux = (f * EX[:, None, None]).sum(0) / rho * mask
+    uy = (f * EY[:, None, None]).sum(0) / rho * mask
+    p = rho * CS2
+    mdot_in = float((rho * ux)[0, jin].sum())
+    mdot_out = float((rho * ux)[-1, jout].sum())
+    ddp_final = float("nan")
+    nback = max(int(dp_window // check_every), 2)
+    if len(hist) > nback:
+        ddp_final = abs(hist[-1][4] / hist[-1 - nback][4] - 1.0)
+    info = dict(converged=bool(converged), iters=it + 1, tau_p=tau_p, nu=nu,
+                U_in=U_ref, mdot_in=mdot_in, mdot_out=mdot_out,
+                mdot_err=(mdot_out - mdot_in) / max(abs(mdot_in), 1e-30),
+                residual=float(hist[-1][1]) if hist else float("nan"),
+                ddp_final=ddp_final,
+                wall_s=round(time.time() - t0, 1), history=hist)
+    return ux, uy, p, rho, f, info

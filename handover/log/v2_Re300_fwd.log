@@ -1,0 +1,22 @@
+================================================================================
+ Gamboa optimized 単発モデル（プレナム込み）  Re = 300.0, cpm = 16
+================================================================================
+  領域 288 x 266 セル = 17.94 x 16.56 w_v, 流体率 34.2 %
+  [fwd] 288 x 266, 流体 26219 セル, 入口 160 / 出口 160 セル, U_in = 0.00500, nu = 0.00533, tau_p = 0.5160
+    it=  20000 res=2.18e+01 mdot in/out=8.10178e-01/7.85514e-01 dp=3.951381e-03
+    it=  40000 res=1.69e+01 mdot in/out=8.10199e-01/8.10095e-01 dp=4.096938e-03
+    it=  60000 res=1.74e+01 mdot in/out=8.10199e-01/8.21450e-01 dp=4.090993e-03
+    it=  80000 res=1.29e+01 mdot in/out=8.10200e-01/8.23620e-01 dp=4.123925e-03
+    it= 100000 res=1.66e+01 mdot in/out=8.10200e-01/8.08047e-01 dp=4.130183e-03
+    it= 120000 res=1.63e+01 mdot in/out=8.10200e-01/7.97514e-01 dp=4.131844e-03
+    it= 140000 res=1.40e+01 mdot in/out=8.10200e-01/8.02629e-01 dp=4.116488e-03
+    it= 160000 res=1.63e+01 mdot in/out=8.10199e-01/8.21951e-01 dp=4.091519e-03
+    it= 180000 res=1.29e+01 mdot in/out=8.10200e-01/8.22131e-01 dp=4.126938e-03
+  [fwd] dp = 4.130892e-03 (格子) = 27.2616 Pa, 収束 True it=195001 res=1.64e+01 6444s
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re300_cpm16_fwd_fields.npz
+
+  Di = Δp_逆 / Δp_順 = 30.5797 / 27.2616 = 1.1217
+  Gamboa Fig.7 の 2D CFD = 1.12  -> 差 +0.002 (+0.2 %)
+  参考: 周期版（案 2、閉じ壁）の Di_valve は n/a
+
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re300_cpm16_fwd.json

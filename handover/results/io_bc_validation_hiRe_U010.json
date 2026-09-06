@@ -1,0 +1,40 @@
+{
+ "cpm": 16,
+ "U": 0.1,
+ "L": 20.0,
+ "rows": [
+  {
+   "Re": 100.0,
+   "cpm": 16,
+   "L_wv": 20.0,
+   "nx": 320,
+   "nu": 0.032,
+   "tau_p": 0.596,
+   "converged": true,
+   "iters": 20501,
+   "residual": 9.398888871032516e-05,
+   "wall_s": 35.2,
+   "u_max_over_avg": 1.483995245659066,
+   "Re_measured": 109.25161654188544,
+   "fRe": 101.11974651054841,
+   "fRe_corrected": 95.9535661070245,
+   "mdot_interior_spread": 2.5892997756900227e-06
+  },
+  {
+   "Re": 300.0,
+   "diverged": true,
+   "message": "diverged at it=10000"
+  },
+  {
+   "Re": 500.0,
+   "diverged": true,
+   "message": "diverged at it=4500"
+  },
+  {
+   "Re": 1000.0,
+   "diverged": true,
+   "message": "diverged at it=3000"
+  }
+ ],
+ "passed": false
+}

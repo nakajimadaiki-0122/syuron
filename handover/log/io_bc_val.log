@@ -1,0 +1,31 @@
+======================================================================================
+ 入口一様流速 + 出口定圧（Zou-He）の解析解検証   平行平板, Dh = 2w
+======================================================================================
+    Re  L[w_v]     nx   tau_p  umax/uavg     f*Re      補正後       内部ばらつき     収束      s
+    it=  25000  res=7.774e-09  mdot in/out = 8.381878e-01 / 7.839211e-01
+   100      30    480  0.5480    1.48916   96.658   95.690     1.25e-05   True     30
+    it=  25000  res=1.901e+00  mdot in/out = 8.359467e-01 / 8.647743e-01
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:383: RuntimeWarning: overflow encountered in square
+  if len(hist) >= 3:
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:387: RuntimeWarning: overflow encountered in multiply
+  ux, uy = ux_n, uy_n
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:387: RuntimeWarning: overflow encountered in square
+  ux, uy = ux_n, uy_n
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:387: RuntimeWarning: invalid value encountered in subtract
+  ux, uy = ux_n, uy_n
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:390: RuntimeWarning: invalid value encountered in subtract
+  if ckpt and it % ckpt_every == 0 and it > 0:
+Traceback (most recent call last):
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\16_validate_io_bc.py", line 126, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\16_validate_io_bc.py", line 105, in main
+    r = run(float(Re), a.cpm, float(L), U=a.U, iters=a.iters)
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\16_validate_io_bc.py", line 46, in run
+    ux, uy, p, rho, f, info = lbm.solve_flow_io(
+                              ~~~~~~~~~~~~~~~~~^
+        mask, nu, U, iters=iters, tol=tol, report=rep)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py", line 368, in solve_flow_io
+    raise FloatingPointError(f"diverged at it={it}")
+FloatingPointError: diverged at it=33000

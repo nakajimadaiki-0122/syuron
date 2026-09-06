@@ -1,0 +1,14 @@
+================================================================================
+ Gamboa optimized 単発モデル（プレナム込み）  Re = 100.0, cpm = 16
+================================================================================
+  領域 288 x 266 セル = 17.94 x 16.56 w_v, 流体率 34.2 %
+  [rev] 288 x 266, 流体 26219 セル, 入口 160 / 出口 160 セル, U_in = 0.00500, nu = 0.01600, tau_p = 0.5480
+    it=  20000 res=7.39e-05 mdot in/out=8.18844e-01/8.18798e-01 dp=7.849236e-03
+  [rev] dp = 7.851305e-03 (格子) = 5.7571 Pa, 収束 True it=35001 res=3.83e-05 1289s
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re100_cpm16_rev_fields.npz
+
+  Di = Δp_逆 / Δp_順 = 5.7571 / 5.7351 = 1.0038
+  Gamboa Fig.7 の 2D CFD = 1.02  -> 差 -0.016 (-1.6 %)
+  参考: 周期版（案 2、閉じ壁）の Di_valve は 0.9925
+
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re100_cpm16_rev.json

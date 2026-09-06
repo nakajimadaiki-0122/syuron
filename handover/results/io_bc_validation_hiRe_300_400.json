@@ -1,0 +1,18 @@
+{
+ "cpm": 16,
+ "U": 0.05,
+ "L": 20.0,
+ "rows": [
+  {
+   "Re": 300.0,
+   "diverged": true,
+   "message": "diverged at it=7000"
+  },
+  {
+   "Re": 400.0,
+   "diverged": true,
+   "message": "diverged at it=5500"
+  }
+ ],
+ "passed": false
+}

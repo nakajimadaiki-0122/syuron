@@ -1,0 +1,35 @@
+================================================================================
+ Gamboa optimized 単発モデル（プレナム込み）  Re = 500.0, cpm = 16
+================================================================================
+  領域 288 x 266 セル = 17.94 x 16.56 w_v, 流体率 34.2 %
+  [fwd] 288 x 266, 流体 26219 セル, 入口 160 / 出口 160 セル, U_in = 0.00500, nu = 0.00320, tau_p = 0.5096
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:394: RuntimeWarning: overflow encountered in square
+  if it > ramp * 2 and (d < tol or ddp < dp_tol):
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:398: RuntimeWarning: overflow encountered in square
+  if ckpt and it % ckpt_every == 0 and it > 0:
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:398: RuntimeWarning: invalid value encountered in subtract
+  if ckpt and it % ckpt_every == 0 and it > 0:
+C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py:401: RuntimeWarning: invalid value encountered in subtract
+  
+Traceback (most recent call last):
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\17_run_gamboa_full.py", line 202, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\17_run_gamboa_full.py", line 119, in main
+    r, ux, uy, p, rho = solve_one(m, a.Re, a.U, a.cpm, lab, a.iters,
+                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                  a.tol, ckpt=ck, w_mm=w_mm,
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                  dp_tol=a.dp_tol)
+                                  ^^^^^^^^^^^^^^^^
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\17_run_gamboa_full.py", line 55, in solve_one
+    ux, uy, p, rho, f, info = lbm.solve_flow_io(
+                              ~~~~~~~~~~~~~~~~~^
+        mask, nu, U_in, iters=iters, tol=tol, report=rep, ckpt=ckpt,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        dp_tol=dp_tol)
+        ^^^^^^^^^^^^^^
+  File "C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\scripts\..\src\lbm.py", line 368, in solve_flow_io
+    it = 0
+    
+FloatingPointError: diverged at it=12500
