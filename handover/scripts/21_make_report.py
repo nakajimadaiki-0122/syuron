@@ -90,7 +90,9 @@ def main():
         if d:
             runs.append((Re, cpm, d))
 
-    ref = {100: 1.02, 200: 1.07, 300: 1.12, 500: 1.37, 1000: 1.73, 2000: 1.92}
+    # Fig.7 の画素実測（scripts/23_digitize_fig7.py）。
+    # Re <= 250 は実線（ref CFD）と重なって分離できないので値を置かない。
+    ref = {300: 1.1622, 400: 1.2523, 500: 1.3667, 600: 1.4808, 1000: 1.7332}
     rows = []
     for Re, cpm, d in runs:
         f = d.get("fwd", {}).get("dp_Pa")
@@ -116,7 +118,7 @@ def main():
                      .get("dangle_deg", float("nan")), 3),
         coll_off=fmt(top.get("collinearity", {}).get("right", {})
                      .get("offset_wv", float("nan")), 3),
-        di100=fmt(next((r["di"] for r in rows if r["Re"] == 100), None), 4),
+        di300=fmt(next((r["di"] for r in rows if r["Re"] == 300), None), 4),
         plate=plate_spec(cad),
     )
     open(OUT, "w", encoding="utf-8").write(html)
@@ -283,10 +285,11 @@ li {{ margin-bottom:7px; }}
   <p class="eyebrow">Gamboa 2005 の再現 — 2026-09-06</p>
   <h1>Tesla バルブ再現ノート</h1>
   <p class="lede">周期セルで再現できなかった原因を論文図の実測で突き止め、
-  プレナム込みの単発モデルを組み直しました。3D モデルと現時点の数値をまとめています。</p>
+  プレナム込みの単発モデルを組み直しました。比較対象の Fig.7 も画素実測で
+  取り直しています。3D モデルと現時点の数値をまとめています。</p>
   <dl class="readout">
-    <div><dt>Di（Re = 100）</dt><dd>{di100}</dd>
-      <small>Gamboa Fig.7 は 1.02 ± 0.02。周期版は 0.9925 で 1 を割っていました</small></div>
+    <div><dt>Di（Re = 300）</dt><dd>{di300}</dd>
+      <small>Fig.7 の実測値は 1.162。差 −3.5 %。周期版は 1 を割っていました</small></div>
     <div><dt>形状の一致（IoU）</dt><dd>{iou}</dd>
       <small>Fig.2 の実形状との重ね合わせ</small></div>
     <div><dt>φ_loop 逆 / 順</dt><dd>{phi_ratio}</dd>
@@ -349,7 +352,7 @@ li {{ margin-bottom:7px; }}
   <div class="sec-head"><span class="n">結果</span><h2>いまの結果</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Re</th><th>格子</th><th>Δp 順 [Pa]</th><th>Δp 逆 [Pa]</th>
-      <th>Di</th><th>Gamboa Fig.7</th><th>差</th></tr></thead>
+      <th>Di</th><th>Fig.7（実測）</th><th>差</th></tr></thead>
     <tbody>{rows_html}</tbody>
   </table></div>
   <p class="hint">Δp はプレナムの直線壁どうしの流量重み平均圧力差。
@@ -399,8 +402,11 @@ li {{ margin-bottom:7px; }}
 <section>
   <div class="sec-head"><span class="n">この先</span><h2>次にやること</h2></div>
   <ul>
-    <li><strong>Re = 300 で Fig.7 と 0.2 % で一致した。</strong>Re = 500（1.37）を計算中で、
-      ここまで合えば Di(Re) 曲線として再現が閉じる</li>
+      <li><strong>Fig.7 の目標値を実測し直した。</strong>Re = 300 の目標は 1.12 ではなく
+      <strong>1.162</strong>（従来の目視は実線 = ref CFD を読んでいた）。
+      本計算は 1.1217 で <strong>3.5 % 低い</strong></li>
+      <li>Re = 400（目標 1.252）と Re = 500（1.367）を計算中。
+      Re = 500 は流れ自体が非定常になるので時間平均で比べる</li>
     <li>格子依存（16 → 24）と収束判定の確認。Gamboa 自身は「要素数倍増で 4 % 未満」と報告</li>
     <li>7 月形状も同じ単発枠組みで解き、Gamboa と同条件で比較する</li>
     <li>3 次元は当面やらない。Gamboa のベンチマーク自体が 2D なので不要で、

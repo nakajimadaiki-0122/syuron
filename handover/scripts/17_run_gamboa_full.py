@@ -33,7 +33,7 @@ import postproc as pp
 
 
 def solve_one(mask, Re, U_ch, cpm, label, iters, tol, ckpt=None, w_mm=1.0,
-              dp_tol=1e-5, dp_window=10000):
+              dp_tol=1e-5, dp_window=10000, avg_tol=1e-3):
     nx, ny = mask.shape
     n_in = int(mask[0].sum())
     n_out = int(mask[-1].sum())
@@ -54,11 +54,14 @@ def solve_one(mask, Re, U_ch, cpm, label, iters, tol, ckpt=None, w_mm=1.0,
     t0 = time.time()
     ux, uy, p, rho, f, info = lbm.solve_flow_io(
         mask, nu, U_in, iters=iters, tol=tol, report=rep, ckpt=ckpt,
-        dp_tol=dp_tol, dp_window=dp_window)
+        dp_tol=dp_tol, dp_window=dp_window, avg_tol=avg_tol)
 
-    dp_lat = pp.pressure_drop(p, ux, mask, i0=1, i1=nx - 2)
+    # 非定常なときは瞬時値ではなく**時間平均**を使う（README §8 B-13）
+    dp_inst = pp.pressure_drop(p, ux, mask, i0=1, i1=nx - 2)
+    dp_lat = info["dp_lattice_mean"]
     scale = pp.lattice_to_physical_scale(Re, 2.0 * w_mm * 1e-3, U_ch)
     dp_Pa = pp.to_pascal(dp_lat, scale)
+    dp_Pa_std = pp.to_pascal(info["dp_lattice_std"], scale)
     # 内部の断面流量のばらつき（BC 列を除く）で質量保存を見る
     g = rho * ux
     fl = np.array([g[i, mask[i]].sum() for i in range(1, nx - 1)])
@@ -66,13 +69,20 @@ def solve_one(mask, Re, U_ch, cpm, label, iters, tol, ckpt=None, w_mm=1.0,
                n_inlet=n_in, n_outlet=n_out, U_in=U_in, U_ch=U_ch, nu=nu,
                tau_p=info["tau_p"], converged=info["converged"],
                iters=info["iters"], residual=info["residual"],
-               dp_lattice=dp_lat, dp_Pa=dp_Pa,
+               dp_lattice=dp_lat, dp_Pa=dp_Pa, dp_Pa_std=dp_Pa_std,
+               dp_lattice_inst=dp_inst, dp_lattice_std=info["dp_lattice_std"],
+               dp_lattice_min=info["dp_lattice_min"],
+               dp_lattice_max=info["dp_lattice_max"],
+               unsteady=info["unsteady"], dp_samples=info["dp_samples"],
                mdot_interior_mean=float(fl.mean()),
                mdot_interior_spread=float((fl.max() - fl.min()) / fl.mean()),
                wall_s=round(time.time() - t0, 1))
-    print(f"  [{label}] dp = {dp_lat:.6e} (格子) = {dp_Pa:.4f} Pa, "
-          f"収束 {info['converged']} it={info['iters']} "
-          f"res={info['residual']:.2e} {res['wall_s']:.0f}s", flush=True)
+    print(f"  [{label}] dp = {dp_lat:.6e} +- {info['dp_lattice_std']:.1e} "
+          f"(格子, 直近 {info['dp_samples']} 点の平均) = {dp_Pa:.4f} +- "
+          f"{dp_Pa_std:.4f} Pa, 収束 {info['converged']}"
+          f"{'（非定常・統計的）' if info['unsteady'] else ''} "
+          f"it={info['iters']} res={info['residual']:.2e} "
+          f"{res['wall_s']:.0f}s", flush=True)
     return res, ux, uy, p, rho
 
 
@@ -90,6 +100,8 @@ def main():
                     help="向きを分けて別プロセスで走らせると並列化できる")
     ap.add_argument("--dp-window", type=int, default=10000,
                     help="Δp の変化を見る窓［反復］")
+    ap.add_argument("--avg-tol", type=float, default=1e-3,
+                    help="非定常時: 時間平均が動かなくなったと判定する相対差")
     ap.add_argument("--dp-tol", type=float, default=1e-5,
                     help="Δp の相対変化がこれ未満で収束とみなす")
     a = ap.parse_args()
@@ -120,7 +132,8 @@ def main():
                           f"ck_full_{lab}_Re{int(a.Re)}_cpm{a.cpm}.npy")
         r, ux, uy, p, rho = solve_one(m, a.Re, a.U, a.cpm, lab, a.iters,
                                       a.tol, ckpt=ck, w_mm=w_mm,
-                                      dp_tol=a.dp_tol, dp_window=a.dp_window)
+                                      dp_tol=a.dp_tol, dp_window=a.dp_window,
+                                      avg_tol=a.avg_tol)
         # phi_loop（主流路帯の外を通る質量流量の割合）は主流路が水平な区間のみ意味を持つ
         lp = pp.loop_mass_fraction(ux, m, ys, main_half_width_mm=0.5, rho=rho)
         r["phi_loop_mean"] = lp["phi_loop_mean"]
@@ -157,8 +170,11 @@ def main():
         return
     Di = out["rev"]["dp_Pa"] / out["fwd"]["dp_Pa"]
     out["Di"] = Di
-    ref = {100: 1.02, 200: 1.07, 300: 1.12, 500: 1.37, 600: 1.48,
-           1000: 1.73, 2000: 1.92}
+    # Fig.7 の opt CFD（破線）を画素実測した値（scripts/23_digitize_fig7.py）。
+    # Re <= 250 は実線（ref CFD）と重なって分離できないので入れない。
+    # 2026-08-09 の目視値（Re=300 で 1.12）は**実線を読んでいた**誤りだった。
+    ref = {300: 1.1622, 400: 1.2523, 500: 1.3667, 600: 1.4808,
+           750: 1.5982, 1000: 1.7332, 1250: 1.8079, 1500: 1.8557}
     tgt = ref.get(int(a.Re))
     print(f"\n  Di = Δp_逆 / Δp_順 = {out['rev']['dp_Pa']:.4f} / "
           f"{out['fwd']['dp_Pa']:.4f} = {Di:.4f}")
@@ -166,6 +182,8 @@ def main():
         print(f"  Gamboa Fig.7 の 2D CFD = {tgt:.2f}  -> 差 {Di-tgt:+.3f} "
               f"({100*(Di/tgt-1):+.1f} %)")
         out["gamboa_fig7"] = tgt
+    if not tgt:
+        print("  Fig.7 の実測値なし（Re <= 250 は実線と重なって分離できない）")
     print(f"  参考: 周期版（案 2、閉じ壁）の Di_valve は "
           f"{'0.9925' if a.Re==100 else '0.9678' if a.Re==500 else 'n/a'}")
 

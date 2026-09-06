@@ -331,7 +331,7 @@ def _regularized(fcol, j, rho, ux, uy, unknown):
 def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
                   ramp=5000, report=None, f0=None, rho_out=1.0,
                   ckpt=None, ckpt_every=50000, dp_tol=1e-5, bc="zouhe",
-                  dp_window=10000):
+                  dp_window=10000, avg_tol=1e-3, avg_burn=0.3):
     """入口一様流速・出口定圧で解く（Gamboa の単発モデル用）。
 
     既存の `solve_flow` との違い
@@ -358,6 +358,12 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
     tol    : 収束判定。check_every 反復あたりの max|Δux| / U_in がこれ未満
     dp_tol : Δp の相対変化が **dp_window 反復のあいだ** これ未満なら収束とみなす。
              直近 3 点だけで見ると一時的な平坦部で止まるので窓を取る
+    avg_tol: 非定常な流れ用の判定。Δp が振動して定常判定に入らない場合、
+             **直近 dp_window の平均**と**その 1 つ前の dp_window の平均**が
+             この相対差以内なら「統計的に定常」とみなし、平均値を採用する。
+             Re が高いと流れ自体が非定常になる（2026-09-07、Re=500 で確認）
+    avg_burn: 平均判定を始めるまでの助走（iters に対する割合ではなく、
+             ramp*3 と dp_window*3 の大きい方を下限とする）
     rho_out: 出口の密度（= 圧力）。1.0 が「ゼロゲージ圧」
     bc     : "zouhe"（既定）| "regularized"。
              **正則化 BC は本ソルバ（TRT, Lambda=1/4）では逆に不安定**
@@ -406,6 +412,7 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
     ux = np.zeros((nx, ny))
     uy = np.zeros((nx, ny))
     converged = False
+    unsteady = False
     hist = []
     t0 = time.time()
     it = 0
@@ -437,9 +444,18 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
             nback = max(int(dp_window // check_every), 2)
             if len(hist) > nback:
                 ddp = abs(dp_now / hist[-1 - nback][4] - 1.0)
-            if it > ramp * 2 and (d < tol or ddp < dp_tol):
+            steady = it > ramp * 2 and (d < tol or ddp < dp_tol)
+            # 非定常でも「時間平均が動かなくなった」ら止める
+            stat = False
+            burn = max(3 * ramp, 3 * dp_window)
+            if not steady and it > burn and len(hist) > 2 * nback:
+                m1 = np.mean([h[4] for h in hist[-nback:]])
+                m0 = np.mean([h[4] for h in hist[-2 * nback:-nback]])
+                stat = abs(m1 / m0 - 1.0) < avg_tol
+            if steady or stat:
                 ux, uy = ux_n, uy_n
                 converged = True
+                unsteady = bool(stat and not steady)
                 break
         if ckpt and it % ckpt_every == 0 and it > 0:
             np.save(ckpt, f)
@@ -499,7 +515,15 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
     nback = max(int(dp_window // check_every), 2)
     if len(hist) > nback:
         ddp_final = abs(hist[-1][4] / hist[-1 - nback][4] - 1.0)
-    info = dict(converged=bool(converged), iters=it + 1, tau_p=tau_p, nu=nu,
+    # 直近 dp_window ぶんの Δp の統計（非定常なときはこちらを使う）
+    nback = max(int(dp_window // check_every), 2)
+    win = [h[4] for h in hist[-nback:]] if hist else [float("nan")]
+    info = dict(dp_lattice_mean=float(np.mean(win)),
+                dp_lattice_std=float(np.std(win)),
+                dp_lattice_min=float(np.min(win)),
+                dp_lattice_max=float(np.max(win)),
+                dp_samples=len(win), unsteady=bool(unsteady),
+                converged=bool(converged), iters=it + 1, tau_p=tau_p, nu=nu,
                 U_in=U_ref, mdot_in=mdot_in, mdot_out=mdot_out,
                 mdot_err=(mdot_out - mdot_in) / max(abs(mdot_in), 1e-30),
                 residual=float(hist[-1][1]) if hist else float("nan"),
