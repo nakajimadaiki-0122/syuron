@@ -45,11 +45,10 @@ def cap(poly, z, up):
         for g in poly.geoms:
             out += cap(g, z, up)
         return out
-    P, T = M.triangulate_polygon(poly)
     out = []
-    for t in T:
-        v = [(P[i][0], P[i][1], z) for i in t]
-        a, b, c = P[t[0]], P[t[1]], P[t[2]]
+    for t in M.triangulate_polygon(poly):
+        v = [(t[i][0], t[i][1], z) for i in range(3)]
+        a, b, c = t
         cr = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
         if (cr > 0) != up:
             v = v[::-1]
@@ -85,6 +84,7 @@ def closed(ring, ccw):
 
 def fluid_solid(poly, depth):
     """流体多角形を深さ方向に押し出した閉じた立体。"""
+    poly = M.clean_polygon(poly)
     faces = cap(poly, 0.0, up=False) + cap(poly, depth, up=True)
     faces += wall(closed(poly.exterior, True), 0.0, depth, outward=True)
     for r in poly.interiors:
@@ -104,6 +104,7 @@ def grooved_plate(poly, depth, wall_t, margin_xy, ports, port_d):
     ports  : [(x, y), ...] ポート中心
     port_d : ポート直径
     """
+    poly = M.clean_polygon(poly)
     x0, y0, x1, y1 = poly.bounds
     X0, X1 = x0 - margin_xy, x1 + margin_xy
     Y0, Y1 = y0 - margin_xy, y1 + margin_xy

@@ -58,6 +58,7 @@ from __future__ import annotations
 import numpy as np
 from shapely.geometry import Polygon, Point
 from shapely.ops import unary_union
+from shapely import affinity
 
 # Table 2（論文記載値、w_v で無次元化）
 OPTIMIZED = dict(X2=1.60, n=0.797, Y3=0.608, R=2.35, alpha=41.9, LENOUT=2.94)
@@ -269,3 +270,102 @@ def straight_duct(length, w=1.0):
     """検証用の直線流路（同じ BC で f*Re = 96 を確認するため）。"""
     return Polygon([(0, -0.5 * w), (length, -0.5 * w),
                     (length, 0.5 * w), (0, 0.5 * w)])
+
+
+def stage_faces(info, w=1.0):
+    """1 段（プレナム無し）の入口面・出口面を返す。
+
+    戻り値は ((入口中心, 入口の外向き法線), (出口中心, 出口の外向き法線))。
+    入口は x = -0.5w の鉛直面（法線 -x、流れは +x）、
+    出口は出口区間の端（法線は e = 下流向き）。どちらも幅 w。
+    """
+    al = np.radians(info["alpha_deg"])
+    e = np.array([np.sin(al), -np.cos(al)])
+    m = np.array([np.cos(al), np.sin(al)])
+    P2 = np.array(info["island_tip"])
+    J = np.array(info["J"])
+    t_J = float(np.dot(J - P2, e))
+    L = t_J + info["lenout_axis"] * w
+    out_c = P2 + 0.5 * w * m + L * e
+    return (np.array([-0.5 * w, 0.0]), np.array([1.0, 0.0])), (out_c, e)
+
+
+def chain(n_stages, which="optimized", w=1.0, gap=0.0, mirror=True,
+          level=True, arc_pts=ARC_PTS, **over):
+    """バルブを n 段つないだ流路を返す。
+
+    1 段の出口は入口から alpha だけ折れている（Gamboa の形状がそうなっている）。
+    そのまま繋ぐと段ごとに曲がって螺旋になるので、**1 段おきに上下反転**して
+    折れを相殺する（mirror=True、既定）。偶数段なら全体の向きが入口と揃う。
+    Tesla の原特許や 7 月形状と同じ、ジグザグ中心線の直線流路になる。
+
+    gap : 段と段のあいだに入れる直線区間の長さ [w_v]。
+          Porwal は valve-to-valve 距離 1 mm（= 1 D_H）を使っている
+    level : True なら入口の向きを +alpha_axis/2（= 24.05 度）から始める。
+          各段が 48.1 度折れるので、向きは +24.05 度と −24.05 度を往復し、
+          **全体の平均方向が水平**になる（横ずれが段ごとに相殺される）。
+          False にすると 0 度から始まり、鎖全体が 24 度下がっていく
+
+    Returns
+    -------
+    poly : shapely Polygon（各段の島が内側リング）
+    info : dict（各段の配置、入口・出口の位置と向き、重なりの検査結果）
+    """
+    base, binfo = build(which, w=w, arc_pts=arc_pts, include_plenums=False,
+                        **over)
+    (in_c, _), (out_c, out_d) = stage_faces(binfo, w)
+
+    parts, stages = [], []
+    pos = np.array([-0.5 * w, 0.0])          # 現在の接続面の中心
+    half = 0.5 * np.radians(90.0 - binfo["alpha_deg"]) if level else 0.0
+    dirv = np.array([np.cos(half), np.sin(half)])   # 現在の下流向き
+    for k in range(n_stages):
+        flip = mirror and (k % 2 == 1)
+        shp = affinity.scale(base, yfact=-1.0, origin=(0, 0)) if flip else base
+        oc = np.array([out_c[0], -out_c[1]]) if flip else out_c
+        od = np.array([out_d[0], -out_d[1]]) if flip else out_d
+        phi = np.arctan2(dirv[1], dirv[0])
+        c, s_ = np.cos(phi), np.sin(phi)
+        R = np.array([[c, -s_], [s_, c]])
+        t = pos - R @ in_c
+        g = affinity.affine_transform(shp, [R[0, 0], R[0, 1], R[1, 0], R[1, 1],
+                                            t[0], t[1]])
+        parts.append(g)
+        stages.append(dict(index=k, mirrored=bool(flip),
+                           inlet=(pos + 0.0).tolist(),
+                           inlet_dir=dirv.tolist()))
+        pos = R @ oc + t
+        dirv = R @ od
+        if k < n_stages - 1:
+            # 接続部は必ず入れる。gap = 0 でも eps ぶん前後へはみ出させて
+            # 両側の段と**重ねる**。突き合わせだけだと浮動小数の誤差で
+            # 髪の毛ほどの隙間ができ、union が MultiPolygon になる。
+            eps = 1e-6 * w
+            nrm = np.array([-dirv[1], dirv[0]])
+            a = pos - eps * dirv
+            b = pos + (gap * w + eps) * dirv
+            parts.append(Polygon([a + 0.5 * w * nrm, a - 0.5 * w * nrm,
+                                  b - 0.5 * w * nrm, b + 0.5 * w * nrm]))
+            pos = pos + gap * w * dirv
+
+    poly = unary_union(parts).buffer(0)
+    if poly.geom_type != "Polygon":
+        raise ValueError(f"連結が単一多角形にならない: {poly.geom_type}"
+                         "（gap を入れるか段数を減らす）")
+
+    # 隣り合わない段どうしが重なっていないか（重なると流路が短絡する）
+    overlaps = []
+    valves = [p for p in parts if p.area > 2 * w * w]
+    for i in range(len(valves)):
+        for j in range(i + 2, len(valves)):
+            a = valves[i].intersection(valves[j]).area
+            if a > 1e-9:
+                overlaps.append(dict(i=i, j=j, area=float(a)))
+
+    info = dict(n_stages=n_stages, gap=float(gap), mirror=bool(mirror),
+                stage_area=float(base.area), total_area=float(poly.area),
+                bounds=[float(v) for v in poly.bounds],
+                outlet=pos.tolist(), outlet_dir=dirv.tolist(),
+                n_islands=len(poly.interiors), stages=stages,
+                overlaps=overlaps, base=binfo)
+    return poly, info

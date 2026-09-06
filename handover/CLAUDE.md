@@ -62,7 +62,8 @@ Fig.2 の画素実測で位相を確定させ、忠実形状 + 入口出口 BC �
 | `src/lbm.py` | D2Q9 TRT。`solve_flow_periodic`（周期＋体積力）/ `solve_flow_io`（**単発、入口出口 BC**）/ `solve_flow`（旧、使わない） |
 | `src/postproc.py` | Δp・Di・φ_loop の**定義を集約**。他論文と比較する前にここを読む |
 | `src/gamboa.py` | **周期版**の Gamboa 形状（閉じ壁）。7 月形状との比較用に残す。Gamboa 再現には使えない |
-| `src/gamboa_full.py` | **単発版**（プレナム込み）の Gamboa 形状。**Gamboa 再現はこちら** |
+| `src/gamboa_full.py` | **単発版**（プレナム込み）の Gamboa 形状。**Gamboa 再現はこちら**。`chain()` で多段も作れる |
+| `src/mesh.py` | 穴つき多角形の耳刈り分割・STL/DXF 出力。押し出す前に `clean_polygon` を通すこと |
 | `scripts/01_validate_solver.py` | Phase 0A。解析解との照合 |
 | `scripts/04_run_unitcell.py` | 周期単位セル（7 月形状の Re スイープ） |
 | `scripts/05,06` | DXF から接合角を実測し Gamboa の β と比較 |
@@ -78,7 +79,10 @@ Fig.2 の画素実測で位相を確定させ、忠実形状 + 入口出口 BC �
 | `docs/gamboa2005_geometry.md` | Gamboa 幾何の読解と逆算。確定／未確定を明示 |
 | **`HANDOFF.md`** | **引き継ぎの入口。まずこれを読む** |
 | `progress/YYYY-MM-DD.md` | セッションごとの進捗記録。最新は 2026-09-06 |
-| `cad/` | CAD 用の DXF / STL |
+| `scripts/20_make_3d_model.py` | 3D モデル（流体体積・溝板・蓋）の STL |
+| `scripts/21_make_report.py` | 閲覧用 HTML（3D 表示つき） |
+| `scripts/22_make_chain.py` | **多段流路**（2〜8 段）の生成と CAD 出力 |
+| `cad/` | CAD 用の DXF / STL。README あり |
 
 ## 主要な数値（覚えておくと便利）
 

@@ -23,24 +23,24 @@
  "models": [
   {
    "file": "gamboa_fluid_3d.stl",
-   "triangles": 5332,
+   "triangles": 5316,
    "volume_mm3": 102.80016179759416,
    "nonmanifold": 0,
-   "edges": 7998
+   "edges": 7974
   },
   {
    "file": "gamboa_valve_only_fluid_3d.stl",
-   "triangles": 1488,
-   "volume_mm3": 24.269178033677917,
+   "triangles": 1472,
+   "volume_mm3": 24.269178033677914,
    "nonmanifold": 0,
-   "edges": 2232
+   "edges": 2208
   },
   {
    "file": "gamboa_plate_3d.stl",
-   "triangles": 6376,
+   "triangles": 6360,
    "volume_mm3": 853.6679299239269,
    "nonmanifold": 0,
-   "edges": 9564
+   "edges": 9540
   },
   {
    "file": "gamboa_lid_3d.stl",
