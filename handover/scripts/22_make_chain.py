@@ -12,10 +12,12 @@ Gamboa の 1 段は入口から alpha だけ折れて出るので、そのまま
 
 | ファイル | 内容 |
 |---|---|
-| `gamboa_chain{n}_2d.dxf` | 多段流路の 2D 輪郭（外形 + 島 n 個） |
-| `gamboa_chain{n}_fluid_3d.stl` | 押し出した流体体積 |
-| `gamboa_chain{n}_plate_3d.stl` | 溝を彫った板（裏面に入口・出口ポート） |
-| `figures/gamboa_chain{n}.png` | 形状と接続の確認図 |
+| `stair{n}_{size}_outline.dxf` | 段々流路の 2D 輪郭（外形 + 島 n 個） |
+| `stair{n}_{size}_fluid.stl` | 押し出した流体体積 |
+| `stair{n}_{size}_plate.stl` | 溝を彫った板（裏面に入口・出口ポート） |
+| `figures/stair{n}_{size}.png` | 形状と接続の確認図 |
+
+size は small / std / large（ループ外半径 R = 1.9 / 2.35 / 3.0 w_v）。
 
 注意
 ----
@@ -108,6 +110,9 @@ def grooved_plate(poly, depth, wall_t, margin, ports, port_d):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-n", "--stages", type=int, default=4)
+    ap.add_argument("--size", default="std",
+                    choices=["small", "std", "large"],
+                    help="こぶの大きさ（ループ外半径 R = 1.9 / 2.35 / 3.0 w_v）")
     ap.add_argument("--gap", type=float, default=0.0,
                     help="段間の直線区間 [w_v]。Porwal は 1 D_H を使う")
     ap.add_argument("--wv-mm", type=float, default=1.0)
@@ -123,8 +128,9 @@ def main():
     depth = a.depth_mm if a.depth_mm else wv
     os.makedirs(CAD, exist_ok=True)
 
+    R = {"small": 1.9, "std": 2.35, "large": 3.0}[a.size]
     poly, info = GF.chain(a.stages, w=wv, gap=a.gap, arc_pts=a.arc_pts,
-                          level=not a.no_level)
+                          level=not a.no_level, R=R)
     b = info["bounds"]
     print("=" * 84)
     print(f" Gamboa optimized を {a.stages} 段連結   w_v = {wv} mm, "
@@ -152,25 +158,25 @@ def main():
                         Point(*p_out).buffer(pad_r, resolution=48)])
     print(f"  入口・出口に半径 {pad_r:.2f} mm の溜まりを付けた"
           f"（ポート径 {a.port_mm} mm を収めるため）")
-    tag = f"chain{a.stages}"
+    tag = f"stair{a.stages}_{a.size}"
     rings = M.polygon_rings(poly)
-    f_dxf = os.path.join(CAD, f"gamboa_{tag}_2d.dxf")
+    f_dxf = os.path.join(CAD, f"{tag}_outline.dxf")
     npts = M.write_dxf(f_dxf, rings, note=f"gamboa {a.stages}-stage, w_v={wv}mm")
     print(f"\n  {os.path.basename(f_dxf):34s} {npts:6d} 点（外形 + 島 "
           f"{len(rings)-1} 個）")
 
     faces = fluid_solid(poly, depth)
     bad, ne = M.check_manifold(faces)
-    n = M.write_stl(os.path.join(CAD, f"gamboa_{tag}_fluid_3d.stl"), faces)
+    n = M.write_stl(os.path.join(CAD, f"{tag}_fluid.stl"), faces)
     vol = M.mesh_volume(faces)
-    print(f"  {'gamboa_'+tag+'_fluid_3d.stl':34s} {n:6d} 三角形  "
+    print(f"  {tag+'_fluid.stl':34s} {n:6d} 三角形  "
           f"体積 {vol:9.3f} mm^3  非多様体辺 {bad}/{ne}")
 
     pf, ext = grooved_plate(poly, depth, a.wall_mm, a.margin_mm,
                             [tuple(p_in), tuple(p_out)], a.port_mm)
     bad2, ne2 = M.check_manifold(pf)
-    n2 = M.write_stl(os.path.join(CAD, f"gamboa_{tag}_plate_3d.stl"), pf)
-    print(f"  {'gamboa_'+tag+'_plate_3d.stl':34s} {n2:6d} 三角形  "
+    n2 = M.write_stl(os.path.join(CAD, f"{tag}_plate.stl"), pf)
+    print(f"  {tag+'_plate.stl':34s} {n2:6d} 三角形  "
           f"体積 {M.mesh_volume(pf):9.3f} mm^3  非多様体辺 {bad2}/{ne2}")
     print(f"     板 {ext[2]-ext[0]:.1f} x {ext[3]-ext[1]:.1f} x "
           f"{a.wall_mm+depth:.1f} mm、ポート径 {a.port_mm} mm")
@@ -210,7 +216,7 @@ def main():
     ax.set_title(f"Gamboa optimized x {a.stages} stages (gap = {a.gap} w_v)  "
                  f"— dots: stage inlets, square: outlet")
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", f"gamboa_{tag}.png")
+    png = os.path.join(HERE, "..", "figures", f"{tag}.png")
     fig.savefig(png, dpi=130)
     print(f"  saved {os.path.normpath(png)}")
 

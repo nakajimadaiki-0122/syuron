@@ -13,8 +13,10 @@ CLAUDE.md の方針「幾何を近似で作らない」に従い、CFD の前に
 出力
   figures/gamboa_full.png        生成形状と Fig.2 の重ね
   results/gamboa_full_geom.json  骨格点・検証値
-  cad/gamboa_fluid_2d.dxf              2D 輪郭（CAD 用、単位 mm）
-  cad/gamboa_valve_only_fluid_2d.dxf   プレナムを外した版
+  cad/valve1_std_outline.dxf      2D 輪郭（プレナム込み、単位 mm）
+  cad/valve1bare_std_outline.dxf  プレナムを外した版
+
+命名規則は `{形状}_{こぶの大きさ}_{役割}`。cad/README.md の一覧表を参照。
 
 （--which reference で作ると同じ名前で上書きされる。使い分けるなら退避すること）
 
@@ -209,7 +211,7 @@ def main():
                                 arc_pts=a.arc_pts)
     rings = [np.asarray(poly_mm.exterior.coords)] + \
             [np.asarray(r.coords) for r in poly_mm.interiors]
-    f_dxf = os.path.join(cad, "gamboa_fluid_2d.dxf")
+    f_dxf = os.path.join(cad, "valve1_std_outline.dxf")
     write_dxf(f_dxf, rings, unit_note=f"w_v = {wv} mm")
     print(f"\n3. CAD 出力（w_v = {wv} mm, 押し出し {depth} mm）")
     print(f"   {os.path.normpath(f_dxf)}  "
@@ -220,7 +222,7 @@ def main():
                              arc_pts=a.arc_pts, include_plenums=False)
     rings_v = [np.asarray(poly_valve.exterior.coords)] + \
               [np.asarray(r.coords) for r in poly_valve.interiors]
-    f_dxf2 = os.path.join(cad, "gamboa_valve_only_fluid_2d.dxf")
+    f_dxf2 = os.path.join(cad, "valve1bare_std_outline.dxf")
     write_dxf(f_dxf2, rings_v, unit_note=f"valve only, w_v = {wv} mm")
     print(f"   {os.path.normpath(f_dxf2)}")
     print("   STL（3D モデル）は scripts/20_make_3d_model.py で作る")

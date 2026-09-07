@@ -5,7 +5,7 @@
 
 2 種類 × こぶの大きさ 3 通りを出す。
 
-**流路 1（段々）** `figures/gamboa_chain8.png` の形。
+**流路 1（段々）** `figures/stair8_std.png` の形。
 Gamboa の 1 段は入口から alpha だけ折れて出るので、1 段おきに上下反転して
 折れを相殺し、入口の向きを +24.05 度から始めて平均方向を水平にしてある。
 `src/gamboa_full.py: chain()`
@@ -23,6 +23,7 @@ Gamboa の 1 段は入口から alpha だけ折れて出るので、1 段おき�
 | large | 3.0 | 6.5 | |
 
 出力（`cad/`、単位 mm）は各変種について DXF・流体 STL・溝板 STL。
+名前は `{形状}_{大きさ}_{役割}`（例: `side4fwd_large_fluid.stl`）。
 全モデルで「各辺がちょうど 2 枚の三角形に共有される」ことを確認している。
 
 注意
@@ -60,18 +61,18 @@ def emit(tag, poly, depth, wall_t, margin, port_d, pad_r, note):
     poly = S3.port_pads(poly, [p_in, p_out], pad_r)
 
     rings = M.polygon_rings(M.clean_polygon(poly))
-    f_dxf = os.path.join(CAD, f"{tag}_2d.dxf")
+    f_dxf = os.path.join(CAD, f"{tag}_outline.dxf")
     npts = M.write_dxf(f_dxf, rings, note=f"{tag} ({note})")
 
     ff = S3.fluid_solid(poly, depth)
     bad1, ne1 = M.check_manifold(ff)
-    n1 = M.write_stl(os.path.join(CAD, f"{tag}_fluid_3d.stl"), ff)
+    n1 = M.write_stl(os.path.join(CAD, f"{tag}_fluid.stl"), ff)
     vol = M.mesh_volume(ff)
 
     pf, ext = S3.grooved_plate(poly, depth, wall_t, margin, [p_in, p_out],
                                port_d)
     bad2, ne2 = M.check_manifold(pf)
-    n2 = M.write_stl(os.path.join(CAD, f"{tag}_plate_3d.stl"), pf)
+    n2 = M.write_stl(os.path.join(CAD, f"{tag}_plate.stl"), pf)
 
     ok = (bad1 == 0 and bad2 == 0)
     print(f"  {tag:26s} 外形 {b[2]-b[0]:6.2f} x {b[3]-b[1]:5.2f} mm  "
@@ -128,7 +129,7 @@ def main():
             poly, info = G.straight_with_loops(a.loops, R=R, gap=a.gap, w=wv,
                                                mirror=mirror,
                                                arc_pts=a.arc_pts)
-            r = emit(f"side{a.loops}_{orient}_{name}", poly, depth, a.wall_mm,
+            r = emit(f"side{a.loops}{orient}_{name}", poly, depth, a.wall_mm,
                      a.margin_mm, a.port_mm, pad_r,
                      f"straight+{a.loops} loops, {orient}, R={R} w_v")
             r.update(kind="side_loops", size=name, R=R, orientation=orient,

@@ -88,7 +88,9 @@ Fig.2 の画素実測で位相を確定させ、忠実形状 + 入口出口 BC �
 | `scripts/26_make_variants.py` | **試作用の流路変種**（段々 / 側面こぶ × 大きさ 3 通り） |
 | `src/lbm3d.py` | **D3Q19 TRT**。周期ダクト（体積力）と単発（入口出口 BC） |
 | `src/solid3d.py` | 2D 多角形 → 3D 立体（流体・溝板・蓋）。押し出しの共通処理 |
-| `cad/` | CAD 用の DXF / STL。README あり |
+| `scripts/27_cad_index.py` | cad/ の一覧（`cad/INDEX.md` と `figures/cad_index.png`）を生成 |
+| `src/plotstyle.py` | 図の日本語フォント設定（`plotstyle.use_jp()`） |
+| `cad/` | CAD 用の DXF / STL。**`cad/INDEX.md` に名前と形の対応表** |
 
 ## 主要な数値（覚えておくと便利）
 
@@ -129,6 +131,14 @@ Gamboa の最適化形状ですら Re = 100 では Di ≈ 1.02。方向依存性
 
 `scripts/03_compare.py` の「Di < 1.02 なら Tesla として機能していない」という表示は
 Re = 100 では意味を持たない。鵜呑みにしないこと。
+
+## CAD の命名規則
+
+`{形状}_{こぶの大きさ}_{役割}`。形状は `valve1`（プレナム込み単発）/
+`valve1bare`（プレナム無し）/ `stair{n}`（段々）/ `side{n}fwd`・`side{n}rev`
+（直線 + 側面こぶ）。大きさは small / std / large（R = 1.9 / 2.35 / 3.0 w_v）。
+役割は `_outline.dxf` / `_fluid.stl` / `_plate.stl` / `_lid.stl`。
+**一覧は `cad/INDEX.md` と `figures/cad_index.png`**（`scripts/27_cad_index.py` が生成）。
 
 ## 次のタスク
 

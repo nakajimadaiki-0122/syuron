@@ -98,7 +98,7 @@
    "overlaps": 0
   },
   {
-   "tag": "side4_fwd_small",
+   "tag": "side4fwd_small",
    "note": "straight+4 loops, fwd, R=1.9 w_v",
    "dxf_points": 5906,
    "bounds": [
@@ -128,7 +128,7 @@
    "loop_top": 4.3
   },
   {
-   "tag": "side4_fwd_std",
+   "tag": "side4fwd_std",
    "note": "straight+4 loops, fwd, R=2.35 w_v",
    "dxf_points": 5943,
    "bounds": [
@@ -158,7 +158,7 @@
    "loop_top": 5.2
   },
   {
-   "tag": "side4_fwd_large",
+   "tag": "side4fwd_large",
    "note": "straight+4 loops, fwd, R=3.0 w_v",
    "dxf_points": 6013,
    "bounds": [
@@ -188,7 +188,7 @@
    "loop_top": 6.5
   },
   {
-   "tag": "side4_rev_small",
+   "tag": "side4rev_small",
    "note": "straight+4 loops, rev, R=1.9 w_v",
    "dxf_points": 5906,
    "bounds": [
@@ -218,7 +218,7 @@
    "loop_top": 4.3
   },
   {
-   "tag": "side4_rev_std",
+   "tag": "side4rev_std",
    "note": "straight+4 loops, rev, R=2.35 w_v",
    "dxf_points": 5943,
    "bounds": [
@@ -248,7 +248,7 @@
    "loop_top": 5.2
   },
   {
-   "tag": "side4_rev_large",
+   "tag": "side4rev_large",
    "note": "straight+4 loops, rev, R=3.0 w_v",
    "dxf_points": 6013,
    "bounds": [

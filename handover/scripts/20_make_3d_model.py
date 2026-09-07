@@ -7,10 +7,10 @@
 
 | ファイル | 内容 |
 |---|---|
-| `gamboa_fluid_3d.stl` | **流体体積**。CFD の領域そのもの。固体から引く用 |
-| `gamboa_plate_3d.stl` | **溝を彫った板**。流路は上面に開き、入口・出口は**板の裏からのポート穴** |
-| `gamboa_lid_3d.stl` | 板と同じ外形の蓋（平板）。貼り合わせると流路が閉じる |
-| `gamboa_valve_only_fluid_3d.stl` | プレナムを外した流体体積 |
+| `valve1_std_fluid.stl` | **流体体積**。CFD の領域そのもの。固体から引く用 |
+| `valve1_std_plate.stl` | **溝を彫った板**。流路は上面に開き、入口・出口は**板の裏からのポート穴** |
+| `valve1_std_lid.stl` | 板と同じ外形の蓋（平板）。貼り合わせると流路が閉じる |
+| `valve1bare_std_fluid.stl` | プレナムを外した流体体積 |
 
 寸法の既定値
   w_v = 1.0 mm（流路幅）、深さ = 1.0 mm（正方形断面）、
@@ -181,9 +181,9 @@ def main():
           f"{poly.bounds[3]-poly.bounds[1]:.2f} mm")
 
     rec = []
-    rec.append(emit("gamboa_fluid_3d.stl", fluid_solid(poly, depth),
+    rec.append(emit("valve1_std_fluid.stl", fluid_solid(poly, depth),
                     "CFD 領域そのもの"))
-    rec.append(emit("gamboa_valve_only_fluid_3d.stl",
+    rec.append(emit("valve1bare_std_fluid.stl",
                     fluid_solid(poly_v, depth), "プレナム無し"))
     # ポートはプレナムの**内側**へ寄せる。中心は直線壁の上にあるので、
     # そこへ穴を開けると半分が板の外に出て閉じたメッシュにならない。
@@ -195,10 +195,10 @@ def main():
     ports = [tuple(Lc + np.array([0.5 * Rp, 0.0])), tuple(Rc - 0.5 * Rp * e)]
     fp, ext = grooved_plate(poly, depth, a.wall_mm, a.margin_mm, ports,
                             a.port_mm)
-    rec.append(emit("gamboa_plate_3d.stl", fp,
+    rec.append(emit("valve1_std_plate.stl", fp,
                     f"板 {ext[1]-ext[0]:.1f} x {ext[3]-ext[2]:.1f} x "
                     f"{a.wall_mm+depth:.1f} mm, ポート径 {a.port_mm} mm"))
-    rec.append(emit("gamboa_lid_3d.stl", plain_plate(*ext, a.lid_mm), "蓋"))
+    rec.append(emit("valve1_std_lid.stl", plain_plate(*ext, a.lid_mm), "蓋"))
 
     ok = all(r["nonmanifold"] == 0 for r in rec)
     print("\n  " + ("すべて閉じたメッシュ（非多様体辺なし）。"
