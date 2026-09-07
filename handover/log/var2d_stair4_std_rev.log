@@ -5,3 +5,6 @@
   格子 582 x 173 = 0.10 M、流体 25 k
   nu = 0.01200, tau_p = 0.5360
   [rev] 入口 120 セル, U_in = 0.00500
+    it=  20000 res=1.34e-03 dp=2.725734e-02
+  [rev] dp = 19.9758 ± 0.0041 Pa, 収束 True（非定常） it=30501 質量ばらつき=7.5e-05 71 分
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\single\variant_stair4_std_2d_Re100_cpm12_rev.json

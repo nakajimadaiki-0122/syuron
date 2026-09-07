@@ -5,3 +5,8 @@
   格子 535 x 173 = 0.09 M、流体 23 k
   nu = 0.01200, tau_p = 0.5360
   [fwd] 入口 120 セル, U_in = 0.00500
+    it=  20000 res=9.08e-04 dp=2.463450e-02
+  [fwd] dp = 18.0449 ± 0.0054 Pa, 収束 True（非定常） it=31501 質量ばらつき=1.9e-04 70 分
+
+  Di = 18.1235 / 18.0449 = 1.0044
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\single\variant_stair4_small_2d_Re100_cpm12_fwd.json

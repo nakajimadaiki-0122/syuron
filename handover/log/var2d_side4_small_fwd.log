@@ -5,3 +5,8 @@
   格子 463 x 124 = 0.06 M、流体 22 k
   nu = 0.01200, tau_p = 0.5360
   [fwd] 入口 120 セル, U_in = 0.00500
+    it=  20000 res=7.31e-04 dp=1.561251e-02
+  [fwd] dp = 11.4478 ± 0.0006 Pa, 収束 True（非定常） it=30501 質量ばらつき=7.2e-06 47 分
+
+  Di = 11.3318 / 11.4478 = 0.9899
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\single\variant_side4_small_2d_Re100_cpm12_fwd.json

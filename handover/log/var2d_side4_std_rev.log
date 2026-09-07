@@ -5,3 +5,6 @@
   格子 533 x 126 = 0.07 M、流体 24 k
   nu = 0.01200, tau_p = 0.5360
   [rev] 入口 120 セル, U_in = 0.00500
+    it=  20000 res=7.01e-05 dp=1.887707e-02
+  [rev] dp = 13.8425 ± 0.0006 Pa, 収束 True it=27501 質量ばらつき=2.9e-06 51 分
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\single\variant_side4_std_2d_Re100_cpm12_rev.json
