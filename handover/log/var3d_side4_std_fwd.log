@@ -5,3 +5,10 @@
   格子 266 x 65 x 8 = 0.14 M、流体 36 k
   nu = 0.00600, tau_p = 0.5180
   [fwd] 入口 360 セル, U_in = 0.00500
+    it=   5000 res=3.74e-03 dp=3.774431e-02 質量ばらつき=3.19e-01
+    it=  10000 res=5.03e-05 dp=4.794854e-02 質量ばらつき=2.43e-03
+    it=  15000 res=2.47e-05 dp=4.805266e-02 質量ばらつき=2.78e-05
+    it=  20000 res=3.47e-05 dp=4.805386e-02 質量ばらつき=3.30e-07
+    it=  25000 res=3.57e-05 dp=4.805387e-02 質量ばらつき=1.76e-08
+  [fwd] dp = 35.2365 ± 0.0001 Pa, 収束 True it=26201 質量ばらつき=1.6e-08 143 分
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\single\variant_side4_std_3d_Re100_cpm6_fwd.json
