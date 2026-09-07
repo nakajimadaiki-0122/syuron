@@ -369,3 +369,42 @@ def chain(n_stages, which="optimized", w=1.0, gap=0.0, mirror=True,
                 n_islands=len(poly.interiors), stages=stages,
                 overlaps=overlaps, base=binfo)
     return poly, info
+
+
+def attach_plenums(poly, ends, Rp=RP, w=1.0):
+    """流路の端に**直線壁が鉛直な半円プレナム**を付ける。
+
+    入口・出口 BC（`lbm.solve_flow_io` / `lbm3d.solve_flow_io`）は
+    **鉛直な BC 面**が前提なので、端の向きが傾いている形状（段々流路など）は
+    そのままでは解けない。プレナムを挟めば、流路がどの角度で入っても
+    BC 面は鉛直になる。単発モデルで使っているのと同じ構成。
+
+    ends : [(点, 外向きの単位ベクトル), ...]
+           点は流路端の中心、ベクトルは領域の外を向く向き
+    """
+    from shapely.geometry import box as _box
+    parts = [poly]
+    planes = []
+    for pt, d in ends:
+        pt = np.asarray(pt, float)
+        d = np.asarray(d, float)
+        d = d / np.linalg.norm(d)
+        # 中心は端面から sqrt(Rp^2 - (w/2)^2) だけ外側に置く。こうすると
+        # 円弧が流路端の両角をちょうど通り、開口部が塞がらない
+        # （距離を Rp にすると円弧が端面の中心に接するだけで、union が割れる）
+        c = pt + float(np.sqrt((Rp * w) ** 2 - (0.5 * w) ** 2)) * d
+        disc = Point(*c).buffer(Rp * w, resolution=256)
+        big = Rp * w + w
+        if d[0] > 0:                              # 下流側: 直線壁の左を残す
+            half = _box(c[0] - big, c[1] - big, c[0], c[1] + big)
+        else:                                     # 上流側: 直線壁の右を残す
+            half = _box(c[0], c[1] - big, c[0] + big, c[1] + big)
+        parts.append(disc.intersection(half))
+        planes.append(dict(x=float(c[0]), y=float(c[1]),
+                           y_range=[float(c[1] - Rp * w), float(c[1] + Rp * w)],
+                           entry=[float(pt[0]), float(pt[1])],
+                           dir=[float(d[0]), float(d[1])]))
+    out = unary_union(parts).buffer(0)
+    if out.geom_type != "Polygon":
+        raise ValueError(f"プレナムを付けたら単一多角形にならない: {out.geom_type}")
+    return out, planes
