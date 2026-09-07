@@ -1,0 +1,28 @@
+{
+ "Re": 100.0,
+ "Re_square": 50.0,
+ "cpm": 6,
+ "depth": 6,
+ "U": 0.05,
+ "nu": 0.006000000000000001,
+ "nx": 108,
+ "ny": 102,
+ "nz": 8,
+ "fluid": 22200,
+ "dim": 3,
+ "which": "optimized",
+ "fwd": {
+  "label": "fwd",
+  "n_inlet": 360,
+  "U_in": 0.005000000000000001,
+  "dp_lattice": 0.01555404332735345,
+  "dp_Pa": 11.405333986508822,
+  "dp_Pa_std": 2.6039586347182344,
+  "converged": false,
+  "unsteady": false,
+  "iters": 12000,
+  "residual": 8.455409399314629,
+  "mass_spread": 0.0008019590534519686,
+  "wall_s": 707.0
+ }
+}

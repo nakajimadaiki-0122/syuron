@@ -1,0 +1,282 @@
+{
+ "wv_mm": 1.0,
+ "depth_mm": 1.0,
+ "wall_mm": 1.0,
+ "port_mm": 2.0,
+ "pad_r_mm": 1.6,
+ "sizes": {
+  "small": 1.9,
+  "std": 2.35,
+  "large": 3.0
+ },
+ "stages": 4,
+ "loops": 4,
+ "gap": 1.0,
+ "models": [
+  {
+   "tag": "stair4_small",
+   "note": "staircase 4 stages, R=1.9 w_v",
+   "dxf_points": 1769,
+   "bounds": [
+    -1.1794293262279603,
+    -3.781708088866438,
+    35.19375786533418,
+    5.072749036752349
+   ],
+   "length": 36.37318719156214,
+   "height": 8.854457125618787,
+   "fluid_triangles": 7068,
+   "fluid_volume_mm3": 94.0472926778448,
+   "plate_triangles": 8096,
+   "plate_extent": [
+    -3.9794293262279603,
+    -5.781708088866438,
+    37.99375786533418,
+    7.072749036752349
+   ],
+   "watertight": true,
+   "kind": "staircase",
+   "size": "small",
+   "R": 1.9,
+   "stages": 4,
+   "overlaps": 0
+  },
+  {
+   "tag": "stair4_std",
+   "note": "staircase 4 stages, R=2.35 w_v",
+   "dxf_points": 1798,
+   "bounds": [
+    -1.7462781782385262,
+    -4.2316871637668,
+    39.14312901585316,
+    5.963354261148467
+   ],
+   "length": 40.88940719409169,
+   "height": 10.195041424915267,
+   "fluid_triangles": 7184,
+   "fluid_volume_mm3": 109.90110236876035,
+   "plate_triangles": 8212,
+   "plate_extent": [
+    -4.546278178238526,
+    -6.2316871637668,
+    41.94312901585317,
+    7.963354261148467
+   ],
+   "watertight": true,
+   "kind": "staircase",
+   "size": "std",
+   "R": 2.35,
+   "stages": 4,
+   "overlaps": 0
+  },
+  {
+   "tag": "stair4_large",
+   "note": "staircase 4 stages, R=3.0 w_v",
+   "dxf_points": 1808,
+   "bounds": [
+    -2.5650598533648985,
+    -4.881656938622879,
+    44.8477762332695,
+    7.24978402972064
+   ],
+   "length": 47.4128360866344,
+   "height": 12.131440968343519,
+   "fluid_triangles": 7224,
+   "fluid_volume_mm3": 132.74219536209284,
+   "plate_triangles": 8256,
+   "plate_extent": [
+    -5.365059853364898,
+    -6.881656938622879,
+    47.647776233269504,
+    9.24978402972064
+   ],
+   "watertight": true,
+   "kind": "staircase",
+   "size": "large",
+   "R": 3.0,
+   "stages": 4,
+   "overlaps": 0
+  },
+  {
+   "tag": "side4_fwd_small",
+   "note": "straight+4 loops, fwd, R=1.9 w_v",
+   "dxf_points": 5906,
+   "bounds": [
+    -0.49239303602452567,
+    -0.5,
+    28.137475015549978,
+    4.299999822224591
+   ],
+   "length": 28.629868051574505,
+   "height": 4.799999822224591,
+   "fluid_triangles": 23616,
+   "fluid_volume_mm3": 81.13367797415056,
+   "plate_triangles": 24648,
+   "plate_extent": [
+    -3.2923930360245257,
+    -3.6,
+    30.93747501554998,
+    6.299999822224591
+   ],
+   "watertight": true,
+   "kind": "side_loops",
+   "size": "small",
+   "R": 1.9,
+   "orientation": "fwd",
+   "loops": 4,
+   "period": 7.157467012893626,
+   "loop_top": 4.3
+  },
+  {
+   "tag": "side4_fwd_std",
+   "note": "straight+4 loops, fwd, R=2.35 w_v",
+   "dxf_points": 5943,
+   "bounds": [
+    -0.8695387550829661,
+    -0.5,
+    33.593719098180244,
+    5.199999780119889
+   ],
+   "length": 34.46325785326321,
+   "height": 5.699999780119889,
+   "fluid_triangles": 23764,
+   "fluid_volume_mm3": 98.21109874458732,
+   "plate_triangles": 24792,
+   "plate_extent": [
+    -3.669538755082966,
+    -3.6,
+    36.39371909818025,
+    7.199999780119889
+   ],
+   "watertight": true,
+   "kind": "side_loops",
+   "size": "std",
+   "R": 2.35,
+   "orientation": "fwd",
+   "loops": 4,
+   "period": 8.615814463315802,
+   "loop_top": 5.2
+  },
+  {
+   "tag": "side4_fwd_large",
+   "note": "straight+4 loops, fwd, R=3.0 w_v",
+   "dxf_points": 6013,
+   "bounds": [
+    -1.4143047937229354,
+    -0.5,
+    41.474960550868396,
+    6.499999719301986
+   ],
+   "length": 42.88926534459133,
+   "height": 6.999999719301986,
+   "fluid_triangles": 24044,
+   "fluid_volume_mm3": 122.78047089263755,
+   "plate_triangles": 25072,
+   "plate_extent": [
+    -4.214304793722936,
+    -3.6,
+    44.2749605508684,
+    8.499999719301986
+   ],
+   "watertight": true,
+   "kind": "side_loops",
+   "size": "large",
+   "R": 3.0,
+   "orientation": "fwd",
+   "loops": 4,
+   "period": 10.722316336147832,
+   "loop_top": 6.5
+  },
+  {
+   "tag": "side4_rev_small",
+   "note": "straight+4 loops, rev, R=1.9 w_v",
+   "dxf_points": 5906,
+   "bounds": [
+    -0.4923930360245272,
+    -0.5,
+    28.137475015549978,
+    4.299999822224591
+   ],
+   "length": 28.629868051574505,
+   "height": 4.799999822224591,
+   "fluid_triangles": 23616,
+   "fluid_volume_mm3": 81.1336779741507,
+   "plate_triangles": 24648,
+   "plate_extent": [
+    -3.292393036024527,
+    -3.6,
+    30.93747501554998,
+    6.299999822224591
+   ],
+   "watertight": true,
+   "kind": "side_loops",
+   "size": "small",
+   "R": 1.9,
+   "orientation": "rev",
+   "loops": 4,
+   "period": 7.157467012893626,
+   "loop_top": 4.3
+  },
+  {
+   "tag": "side4_rev_std",
+   "note": "straight+4 loops, rev, R=2.35 w_v",
+   "dxf_points": 5943,
+   "bounds": [
+    -0.8695387550829636,
+    -0.5,
+    33.593719098180244,
+    5.199999780119889
+   ],
+   "length": 34.46325785326321,
+   "height": 5.699999780119889,
+   "fluid_triangles": 23764,
+   "fluid_volume_mm3": 98.21109874458712,
+   "plate_triangles": 24792,
+   "plate_extent": [
+    -3.6695387550829635,
+    -3.6,
+    36.39371909818025,
+    7.199999780119889
+   ],
+   "watertight": true,
+   "kind": "side_loops",
+   "size": "std",
+   "R": 2.35,
+   "orientation": "rev",
+   "loops": 4,
+   "period": 8.615814463315802,
+   "loop_top": 5.2
+  },
+  {
+   "tag": "side4_rev_large",
+   "note": "straight+4 loops, rev, R=3.0 w_v",
+   "dxf_points": 6013,
+   "bounds": [
+    -1.414304793722934,
+    -0.5,
+    41.474960550868396,
+    6.499999719301986
+   ],
+   "length": 42.88926534459133,
+   "height": 6.999999719301986,
+   "fluid_triangles": 24044,
+   "fluid_volume_mm3": 122.78047089263755,
+   "plate_triangles": 25072,
+   "plate_extent": [
+    -4.214304793722934,
+    -3.6,
+    44.2749605508684,
+    8.499999719301986
+   ],
+   "watertight": true,
+   "kind": "side_loops",
+   "size": "large",
+   "R": 3.0,
+   "orientation": "rev",
+   "loops": 4,
+   "period": 10.722316336147832,
+   "loop_top": 6.5
+  }
+ ],
+ "all_watertight": true
+}

@@ -281,3 +281,70 @@ def rasterize_cell(poly: Polygon, cells_per_w: int, w: float = 1.0,
     ys = np.concatenate([ys[0] - np.arange(pad, 0, -1) / res, ys,
                          ys[-1] + np.arange(1, pad + 1) / res])
     return mask, xs, ys
+
+
+def straight_with_loops(n_loops=4, R=OPTIMIZED["R"], gap=1.0, w=1.0,
+                        which="optimized", mirror=False, arc_pts=ARC_PTS,
+                        **over):
+    """**直線流路の側面にこぶ（ループ）が並ぶ流路**を作る。
+
+    7 月形状（`figures/fwd_vs_rev.png`）と同じ見た目の構成。
+    主流路はまっすぐで、その上に同じループが n 個並ぶ。
+
+    出口区間を閉じ壁に置き換えた周期セルを x 方向に並べたものなので、
+    **Gamboa の単発バルブとは接合部の位相が違う**（2026-09-06 の知見。
+    逆流がループへ入るのに 132 度曲がる必要がある）。
+    Gamboa の Di を再現する形状ではないが、
+    「直線流路 + 側面のこぶ」という構成そのものを試すための形状である。
+
+    Parameters
+    ----------
+    n_loops : こぶの数
+    R       : **こぶの大きさ**（ループ外半径 [w_v]）。ループ頂部は y = w/2 + 2R
+    gap     : こぶとこぶのあいだの直線区間 [w_v]
+    mirror  : True で x 反転（こぶの向きが逆になる）
+
+    Returns
+    -------
+    poly : shapely Polygon（島は内側リング）
+    info : dict
+    """
+    from shapely import affinity
+    p = dict(OPTIMIZED if which.lower().startswith("opt") else REFERENCE)
+    p.update({k: v for k, v in over.items() if k in p})
+    p["R"] = R
+    th = theta_from_params(p["X2"], p["n"], p["Y3"], w)
+    outer, isl, info = _build(th, p["R"] * w, p["alpha"], p["X2"] * w, w)
+    h = 0.5 * w
+    lx, rx = info["loop_x"]
+    L = (rx - lx) + gap * w                       # 1 周期の長さ
+    x0 = lx - 0.5 * gap * w
+
+    loop = Polygon(np.vstack([outer, [[outer[-1, 0], h]], [[outer[0, 0], h]]]))
+    island = Polygon(isl)
+    main = Polygon([(x0, -h), (x0 + n_loops * L, -h),
+                    (x0 + n_loops * L, h), (x0, h)])
+    parts = [main]
+    holes = []
+    for k in range(n_loops):
+        dx = k * L
+        parts.append(affinity.translate(loop, xoff=dx))
+        holes.append(affinity.translate(island, xoff=dx))
+    poly = unary_union(parts).difference(unary_union(holes))
+    if poly.geom_type != "Polygon":
+        raise ValueError(f"単一多角形にならない: {poly.geom_type}")
+    if mirror:
+        poly = affinity.scale(poly, xfact=-1.0, origin=(0, 0))
+        poly = affinity.translate(poly, xoff=-poly.bounds[0] + x0)
+
+    b = poly.bounds
+    info2 = dict(n_loops=n_loops, R=float(R), gap=float(gap), w=float(w),
+                 mirror=bool(mirror), period=float(L),
+                 loop_top=float(h + 2 * R * w),
+                 theta_deg=float(th), beta_deg=float(th - 90.0),
+                 alpha_deg=float(p["alpha"]),
+                 bounds=[float(v) for v in b],
+                 length=float(b[2] - b[0]), height=float(b[3] - b[1]),
+                 area=float(poly.area), n_islands=len(poly.interiors),
+                 params=p)
+    return poly, info2
