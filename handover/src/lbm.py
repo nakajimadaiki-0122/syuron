@@ -331,7 +331,8 @@ def _regularized(fcol, j, rho, ux, uy, unknown):
 def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
                   ramp=5000, report=None, f0=None, rho_out=1.0,
                   ckpt=None, ckpt_every=50000, dp_tol=1e-5, bc="zouhe",
-                  dp_window=10000, avg_tol=1e-3, avg_burn=0.3):
+                  dp_window=10000, avg_tol=1e-3, avg_burn=0.3,
+                  mass_tol=2e-3):
     """入口一様流速・出口定圧で解く（Gamboa の単発モデル用）。
 
     既存の `solve_flow` との違い
@@ -362,6 +363,8 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
              **直近 dp_window の平均**と**その 1 つ前の dp_window の平均**が
              この相対差以内なら「統計的に定常」とみなし、平均値を採用する。
              Re が高いと流れ自体が非定常になる（2026-09-07、Re=500 で確認）
+    mass_tol: 内部（BC 列を除く）の断面流量のばらつきがこれ未満でなければ
+             収束と判定しない。**Δp が落ち着いても質量が溜まり込んでいることがある**
     avg_burn: 平均判定を始めるまでの助走（iters に対する割合ではなく、
              ramp*3 と dp_window*3 の大きい方を下限とする）
     rho_out: 出口の密度（= 圧力）。1.0 が「ゼロゲージ圧」
@@ -444,11 +447,18 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
             nback = max(int(dp_window // check_every), 2)
             if len(hist) > nback:
                 ddp = abs(dp_now / hist[-1 - nback][4] - 1.0)
-            steady = it > ramp * 2 and (d < tol or ddp < dp_tol)
+            # 内部の断面流量が揃っていない = まだ質量が溜まり込んでいる。
+            # これを満たさないと Δp の平均が動かなくても「収束」とは言えない
+            # （2026-09-07、Re=500 で内部ばらつき 20 % のまま統計判定が通った）
+            g = rho * ux_n
+            fl = np.array([g[i, mask[i]].sum() for i in range(1, nx - 1, 4)])
+            spread = float((fl.max() - fl.min()) / max(abs(fl.mean()), 1e-30))
+            mass_ok = spread < mass_tol
+            steady = it > ramp * 2 and mass_ok and (d < tol or ddp < dp_tol)
             # 非定常でも「時間平均が動かなくなった」ら止める
             stat = False
             burn = max(3 * ramp, 3 * dp_window)
-            if not steady and it > burn and len(hist) > 2 * nback:
+            if not steady and mass_ok and it > burn and len(hist) > 2 * nback:
                 m1 = np.mean([h[4] for h in hist[-nback:]])
                 m0 = np.mean([h[4] for h in hist[-2 * nback:-nback]])
                 stat = abs(m1 / m0 - 1.0) < avg_tol
@@ -519,6 +529,7 @@ def solve_flow_io(mask, nu, U_in, iters=400000, tol=1e-7, check_every=500,
     nback = max(int(dp_window // check_every), 2)
     win = [h[4] for h in hist[-nback:]] if hist else [float("nan")]
     info = dict(dp_lattice_mean=float(np.mean(win)),
+                mass_spread_final=float(spread) if hist else float("nan"),
                 dp_lattice_std=float(np.std(win)),
                 dp_lattice_min=float(np.min(win)),
                 dp_lattice_max=float(np.max(win)),

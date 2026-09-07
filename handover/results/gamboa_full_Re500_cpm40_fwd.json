@@ -1,0 +1,48 @@
+{
+ "Re": 500.0,
+ "cpm": 40,
+ "U": 0.05,
+ "which": "optimized",
+ "geometry": {
+  "theta_deg": 161.60739838260656,
+  "beta_deg": 71.60739838260656,
+  "alpha_deg": 41.9,
+  "lenout_axis": 3.274,
+  "Rp": 5.0,
+  "bounds": [
+   -5.4749371855331,
+   -11.158433733516569,
+   12.548784900349135,
+   5.199999780119889
+  ]
+ },
+ "fwd": {
+  "label": "fwd",
+  "nx": 721,
+  "ny": 658,
+  "fluid": 164558,
+  "n_inlet": 400,
+  "n_outlet": 400,
+  "U_in": 0.005,
+  "U_ch": 0.05,
+  "nu": 0.008,
+  "tau_p": 0.524,
+  "converged": true,
+  "iters": 74001,
+  "residual": 20.277664341671926,
+  "dp_lattice": 0.004800042620682193,
+  "dp_Pa": 87.99334051950441,
+  "dp_Pa_std": 20.16742320193855,
+  "dp_lattice_inst": 0.005351326299344539,
+  "dp_lattice_std": 0.0011001342868348374,
+  "dp_lattice_min": 0.003436547000747636,
+  "dp_lattice_max": 0.006537880887418579,
+  "unsteady": true,
+  "dp_samples": 40,
+  "mdot_interior_mean": 2.2558624850676634,
+  "mdot_interior_spread": 0.19556981309736168,
+  "wall_s": 19601.2,
+  "phi_loop_mean": 0.5227059480609136,
+  "phi_loop_max": 1.0
+ }
+}

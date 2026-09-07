@@ -3,3 +3,15 @@
 ================================================================================
   領域 721 x 658 セル = 18.00 x 16.43 w_v, 流体率 34.7 %
   [rev] 721 x 658, 流体 164558 セル, 入口 400 / 出口 400 セル, U_in = 0.00500, nu = 0.00800, tau_p = 0.5240
+    it=  20000 res=1.87e-02 mdot in/out=2.02212e+00/1.89848e+00 dp=3.714559e-03
+    it=  40000 res=1.40e-02 mdot in/out=2.03554e+00/1.90085e+00 dp=5.969170e-03
+    it=  60000 res=1.27e+01 mdot in/out=2.04053e+00/2.15717e+00 dp=6.721314e-03
+    it=  80000 res=2.82e-02 mdot in/out=2.03586e+00/1.78903e+00 dp=5.985639e-03
+  [rev] dp = 6.470432e-03 +- 9.0e-04 (格子, 直近 40 点の平均) = 118.6145 +- 16.4894 Pa, 収束 True（非定常・統計的） it=88001 res=5.31e+00 22059s
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re500_cpm40_rev_fields.npz
+
+  Di = Δp_逆 / Δp_順 = 118.6145 / 87.9933 = 1.3480
+  Gamboa Fig.7 の 2D CFD = 1.37  -> 差 -0.022 (-1.6 %)
+  参考: 周期版（案 2、閉じ壁）の Di_valve は 0.9678
+
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re500_cpm40_rev.json

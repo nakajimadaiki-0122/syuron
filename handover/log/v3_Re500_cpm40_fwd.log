@@ -3,3 +3,9 @@
 ================================================================================
   領域 721 x 658 セル = 18.00 x 16.43 w_v, 流体率 34.7 %
   [fwd] 721 x 658, 流体 164558 セル, 入口 400 / 出口 400 セル, U_in = 0.00500, nu = 0.00800, tau_p = 0.5240
+    it=  20000 res=1.75e-02 mdot in/out=2.01250e+00/1.94222e+00 dp=2.087123e-03
+    it=  40000 res=3.29e+01 mdot in/out=2.04023e+00/2.24672e+00 dp=6.110273e-03
+    it=  60000 res=1.01e-01 mdot in/out=2.02052e+00/1.90053e+00 dp=3.436547e-03
+  [fwd] dp = 4.800043e-03 +- 1.1e-03 (格子, 直近 40 点の平均) = 87.9933 +- 20.1674 Pa, 収束 True（非定常・統計的） it=74001 res=2.03e+01 19601s
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re500_cpm40_fwd_fields.npz
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re500_cpm40_fwd.json  （片方向のみ。Di は未算出）

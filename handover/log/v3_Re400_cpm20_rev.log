@@ -3,3 +3,14 @@
 ================================================================================
   領域 360 x 331 セル = 17.95 x 16.50 w_v, 流体率 34.4 %
   [rev] 360 x 331, 流体 41044 セル, 入口 200 / 出口 200 セル, U_in = 0.00500, nu = 0.00500, tau_p = 0.5150
+    it=  20000 res=1.62e-03 mdot in/out=1.01408e+00/1.01203e+00 dp=4.694243e-03
+    it=  40000 res=4.86e-04 mdot in/out=1.01501e+00/1.01428e+00 dp=5.007628e-03
+    it=  60000 res=1.05e-04 mdot in/out=1.01510e+00/1.01498e+00 dp=5.038265e-03
+    it=  80000 res=7.92e-05 mdot in/out=1.01511e+00/1.01512e+00 dp=5.041245e-03
+  [rev] dp = 5.040848e-03 +- 5.0e-07 (格子, 直近 40 点の平均) = 59.1409 +- 0.0059 Pa, 収束 True（非定常・統計的） it=86501 res=7.20e-05 5074s
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re400_cpm20_rev_fields.npz
+
+  Di = Δp_逆 / Δp_順 = 59.1409 / 42.5663 = 1.3894
+  参考: 周期版（案 2、閉じ壁）の Di_valve は n/a
+
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\gamboa_full_Re400_cpm20_rev.json
