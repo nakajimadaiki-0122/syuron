@@ -217,11 +217,11 @@ def main():
             r[side] = rows
         results.append(r)
         if li == 0:
-            np.savez('results/loop1_centerline.npz', C=C, width=width,
+            np.savez('results/geometry/loop1_centerline.npz', C=C, width=width,
                      I=I, Q=Q, arc=arc, flank=flank, valid=valid)
 
-    os.makedirs("results", exist_ok=True)
-    json.dump(results, open("results/loop_junction_angles.json", "w"),
+    os.makedirs("results/geometry", exist_ok=True)
+    json.dump(results, open("results/geometry/loop_junction_angles.json", "w"),
               indent=1, default=str)
     print("\nsaved results/loop_junction_angles.json")
 

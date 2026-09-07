@@ -124,7 +124,7 @@ def main():
         ax.axis("off")
     fig.suptitle("cad/ の流体形状（_fluid.stl）— 名前と形の対応", fontsize=11)
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", "cad_index.png")
+    png = os.path.join(HERE, "..", "figures", "geometry", "cad_index.png")
     fig.savefig(png, dpi=140)
     print(f"\nsaved {os.path.normpath(png)}")
 

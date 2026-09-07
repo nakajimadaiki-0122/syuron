@@ -250,13 +250,13 @@ def main():
     ax.set_title(f"overlay on Fig.2   IoU = {ov['iou']:.4f}  "
                  "(red only = Fig.2, green only = generated)")
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", "gamboa_full.png")
+    png = os.path.join(HERE, "..", "figures", "geometry", "gamboa_full.png")
     fig.savefig(png, dpi=130)
     print(f"\nsaved {os.path.normpath(png)}")
 
     out = dict(info=info_f, overlay=ov, area_faithful=poly_f.area,
                area_vertical=poly_v.area, cad=dict(wv_mm=wv, depth_mm=depth))
-    j = os.path.join(HERE, "..", "results", "gamboa_full_geom.json")
+    j = os.path.join(HERE, "..", "results", "geometry", "gamboa_full_geom.json")
     json.dump(out, open(j, "w"), indent=1, default=str)
     print(f"saved {os.path.normpath(j)}")
 

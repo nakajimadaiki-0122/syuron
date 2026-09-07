@@ -140,7 +140,7 @@ if __name__ == "__main__":
         res.append(check_shape(f"parametric theta={t}", t, G.OPTIMIZED["R"],
                                G.OPTIMIZED["alpha"], G.OPTIMIZED["X2"]))
     ok = check_periodicity(th, gap=2.0)
-    os.makedirs("results", exist_ok=True)
+    os.makedirs("results/geometry", exist_ok=True)
     json.dump(dict(shapes=res, periodic_ok=bool(ok)),
-              open("results/gamboa_geometry_check.json", "w"), indent=1, default=str)
+              open("results/geometry/gamboa_geometry_check.json", "w"), indent=1, default=str)
     print("\nsaved results/gamboa_geometry_check.json")

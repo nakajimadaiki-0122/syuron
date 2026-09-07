@@ -185,7 +185,7 @@ def main():
     print("\n  " + ("すべて閉じたメッシュ。CAD 取り込み可。" if ok
                     else "**要確認（非多様体辺または段の重なりがある）**"))
 
-    j = os.path.join(HERE, "..", "results", f"cad_{tag}.json")
+    j = os.path.join(HERE, "..", "results", "cad", f"cad_{tag}.json")
     json.dump(dict(stages=a.stages, gap=a.gap, wv_mm=wv, depth_mm=depth,
                    bounds=b, area_mm2=info["total_area"],
                    n_islands=info["n_islands"], outlet=info["outlet"],

@@ -49,11 +49,11 @@ def main():
 
     models = []
     for key, fn, label, note in (
-        ("fluid", "gamboa_fluid_3d.stl", "流体体積（プレナム込み）",
+        ("fluid", "valve1_std_fluid.stl", "流体体積（プレナム込み）",
          "CFD が解いている領域そのもの"),
-        ("valve", "gamboa_valve_only_fluid_3d.stl", "流体体積（バルブ本体）",
+        ("valve", "valve1bare_std_fluid.stl", "流体体積（バルブ本体）",
          "プレナムを外した版"),
-        ("plate", "gamboa_plate_3d.stl", "溝を彫った板",
+        ("plate", "valve1_std_plate.stl", "溝を彫った板",
          "実物モデル。裏面にポート穴"),
     ):
         p = os.path.join(ROOT, "cad", fn)
@@ -71,20 +71,20 @@ def main():
             figs[key] = img_data_uri(p)
             print(f"  {fn}: {os.path.getsize(p)/1024:.0f} KB")
 
-    cad = load_json("results/cad_models.json", {})
-    geom = load_json("results/gamboa_full_geom.json", {})
-    phi = load_json("results/gamboa_full_phi_Re100_cpm16.json", {})
-    top = load_json("results/fig2_topology.json", {})
+    cad = load_json("results/cad/cad_models.json", {})
+    geom = load_json("results/geometry/gamboa_full_geom.json", {})
+    phi = load_json("results/single/gamboa_full_phi_Re100_cpm16.json", {})
+    top = load_json("results/geometry/fig2_topology.json", {})
 
     runs = []
     for Re, cpm in ((100, 16), (300, 16), (500, 32)):
         d = {}
         for lab in ("fwd", "rev"):
-            j = load_json(f"results/gamboa_full_Re{Re}_cpm{cpm}_{lab}.json")
+            j = load_json(f"results/single/gamboa_full_Re{Re}_cpm{cpm}_{lab}.json")
             if j and lab in j:
                 d[lab] = j[lab]
             elif j is None:
-                j2 = load_json(f"results/gamboa_full_Re{Re}_cpm{cpm}.json")
+                j2 = load_json(f"results/single/gamboa_full_Re{Re}_cpm{cpm}.json")
                 if j2 and lab in j2:
                     d[lab] = j2[lab]
         if d:

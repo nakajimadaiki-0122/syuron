@@ -29,8 +29,7 @@ import gamboa_full as GF
 
 
 def load(Re, cpm, which):
-    p = os.path.join(HERE, "..", "results",
-                     f"gamboa_full_Re{Re}_cpm{cpm}_{which}_fields.npz")
+    p = os.path.join(HERE, "..", "results", "single", f"gamboa_full_Re{Re}_cpm{cpm}_{which}_fields.npz")
     if not os.path.exists(p):
         return None
     d = np.load(p)
@@ -112,8 +111,7 @@ def main():
     axes[2].set_xlabel("x [w_v]"); axes[2].set_ylabel("phi_loop")
     axes[2].set_xlim(x_lo, x_hi); axes[2].grid(alpha=0.3); axes[2].legend()
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures",
-                       f"gamboa_full_fields_Re{a.Re}_cpm{a.cpm}.png")
+    png = os.path.join(HERE, "..", "figures", "flow", f"gamboa_full_fields_Re{a.Re}_cpm{a.cpm}.png")
     fig.savefig(png, dpi=130)
     print(f"saved {os.path.normpath(png)}")
 
@@ -123,8 +121,7 @@ def main():
         print("  Gamboa 3.1 節: 高 Di には**逆流時にループへ十分な流量が入る**ことが要る。"
               "\n  この比が 1 を超えていれば機構が働いている。"
               "案 2（閉じ壁）では 0.72 で、逆になっていた。")
-        j = os.path.join(HERE, "..", "results",
-                         f"gamboa_full_phi_Re{a.Re}_cpm{a.cpm}.json")
+        j = os.path.join(HERE, "..", "results", "single", f"gamboa_full_phi_Re{a.Re}_cpm{a.cpm}.json")
         json.dump(res, open(j, "w"), indent=1)
         print(f"saved {os.path.normpath(j)}")
 

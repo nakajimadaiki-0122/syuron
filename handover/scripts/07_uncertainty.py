@@ -18,7 +18,7 @@ import numpy as np
 def load(Re, cpm, suffix=""):
     out = {}
     for case in ("fwd", "rev"):
-        pat = f"results/cell_tesla_channel_cell_{case}_Re{Re}_cpm{cpm}_o*{suffix}.json"
+        pat = f"results/periodic/cell_tesla_channel_cell_{case}_Re{Re}_cpm{cpm}_o*{suffix}.json"
         hits = [f for f in glob.glob(pat)
                 if f.endswith(f"{suffix}.json") and
                 ("_tight" in f) == (suffix == "_tight")]
@@ -98,10 +98,10 @@ def main():
             v = "十分小さい" if u < 0.005 / 3 else ("同程度" if u < 0.005 else "大きすぎる")
             print(f"    Re = {Re:4d}: ±{u:.5f}  → 0.005 に対して {v}")
 
-    os.makedirs("results", exist_ok=True)
+    os.makedirs("results/periodic", exist_ok=True)
     json.dump({f"Re{k[0]}_{k[1]}": (v if not isinstance(v, float) else v)
                for k, v in table.items()},
-              open("results/di_uncertainty.json", "w"), indent=1, default=str)
+              open("results/periodic/di_uncertainty.json", "w"), indent=1, default=str)
     print("\nsaved results/di_uncertainty.json")
 
 

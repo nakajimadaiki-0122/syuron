@@ -84,42 +84,43 @@ Di_p ≈ 1.0 は、順流と逆流で流れ場がほぼ同一であることを�
 
 ```
 syuron/
-├── 目標.md                     研究全体の 5 段階（再現 → モデル → 計測 → 生体構造 → 実測）
+├── 目標.md                     研究全体の 5 段階
+├── README.md                   入口。どこから読むか
 └── handover/                   解析コード一式。ここが作業場所
-    ├── HANDOFF.md              **入口。現在地・地図・次の一手**
+    ├── HANDOFF.md              **現在地・地図・次の一手。まずこれ**
     ├── README.md               本ファイル。技術詳細
     ├── CLAUDE.md               Claude Code 用のコンテキスト
     ├── requirements.txt
-    ├── data/                   7 月形状の幾何
-    │   ├── tesla_channel.dxf       4 段片側 Tesla（W = 1 mm, 34 mm）
-    │   ├── straight_channel.dxf    直線流路（34 × 1 mm）
-    │   └── *_3d.stl, channels_stl.zip, preview_3d.png
-    ├── src/
-    │   ├── geometry.py         DXF → 流体マスク、周期単位セルの切り出し
-    │   ├── lbm.py              D2Q9 TRT。周期版 / 単発版（入口出口 BC）
+    │
+    ├── src/                    ライブラリ
+    │   ├── lbm.py              2 次元 D2Q9 TRT。周期版と単発版（入口出口 BC）
+    │   ├── lbm3d.py            **3 次元 D3Q19 TRT**
     │   ├── postproc.py         Δp, Di, φ_loop の定義を集約
-    │   ├── gamboa.py           **周期版**の Gamboa 形状（閉じ壁）。再現には使えない
-    │   ├── gamboa_full.py      **単発版**（プレナム込み）。Gamboa 再現はこちら
-    │   └── mesh.py             穴つき多角形の耳刈り分割と STL 出力
-    ├── scripts/                番号順に実行できる。詳細は CLAUDE.md の表
-    │   ├── 01                  解析解によるソルバ検証
-    │   ├── 04, 07, 09          周期版（7 月形状の Re スイープ、不確かさ、案 2）
-    │   ├── 05, 06, 08          接合角の実測と比較、生成形状の検証
-    │   ├── 10, 11, 12          作図と流れ場の診断
-    │   ├── 13, 14              **Fig.2 の画素実測**（接合部の位相、プレナムの円）
-    │   ├── 15                  単発形状の生成・Fig.2 重ね・DXF 出力
-    │   ├── 16, 18              入口出口 BC の解析解検証（一様入口 / 高 Re）
-    │   ├── 17                  **案 1 の本体。順流・逆流を解く**
-    │   ├── 19                  場から φ_loop と機構を確認
-    │   ├── 20                  3D モデル（流体体積・溝板・蓋）の STL 出力
-    │   └── 21                  閲覧用 HTML の生成
-    ├── docs/                   原典 PDF と読解メモ
-    ├── progress/               セッションごとの進捗記録（最新が現状）
-    │   └── archive/            役目を終えた古い引き継ぎ
-    ├── results/                JSON（要点）。NPZ と ck_*.npy は git 管理外
-    ├── figures/                図
-    ├── cad/                    DXF / STL（CAD・造形用）
+    │   ├── geometry.py         DXF → 流体マスク
+    │   ├── gamboa.py           **周期版**の形状（閉じ壁）。`straight_with_loops()` で側面こぶ流路
+    │   ├── gamboa_full.py      **単発版**（プレナム込み）。`chain()` で段々流路
+    │   ├── mesh.py             穴つき多角形の耳刈り分割、STL / DXF 出力
+    │   ├── solid3d.py          2D 多角形 → 3D 立体（流体・溝板・蓋）
+    │   └── plotstyle.py        図の日本語フォント設定
+    │
+    ├── scripts/                **README.md に用途別の一覧**
+    ├── data/                   7 月形状の幾何（DXF, STL）
+    ├── docs/                   原典 PDF と読解メモ、図の画像
+    │
+    ├── results/                **README.md あり。**サブディレクトリで分類
+    │   ├── validation/         解析解による検証
+    │   ├── geometry/           幾何の実測・生成
+    │   ├── single/             案 1（プレナム込み単発）の結果
+    │   ├── periodic/           案 2（周期セル）の結果
+    │   └── cad/                CAD のメタ情報
+    │
+    ├── figures/                **README.md あり**
+    │   ├── geometry/           形状の図（CAD 一覧 `cad_index.png` もここ）
+    │   └── flow/               流れの図
+    │
+    ├── cad/                    **INDEX.md に名前と形の対応表**
     ├── report/                 閲覧用 HTML（1 ファイル完結）
+    ├── progress/               セッションごとの記録（最新が現状）。archive/ は過去の引き継ぎ
     └── log/                    実行ログ。archive/ は上書きされた過去の走り
 ```
 

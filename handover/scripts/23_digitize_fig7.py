@@ -45,7 +45,7 @@ from scipy.interpolate import PchipInterpolator
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 IMG = os.path.join(HERE, "..", "docs", "gamboa2005_fig7.png")
-OUT = os.path.join(HERE, "..", "results", "fig7_digitized.json")
+OUT = os.path.join(HERE, "..", "results", "geometry", "fig7_digitized.json")
 
 RE_RANGE = (0.0, 2000.0)
 DI_RANGE = (1.0, 2.0)
@@ -229,7 +229,7 @@ def main():
     ax.set_title("Fig.7 digitization: opt CFD (dashed)")
     ax.legend(fontsize=8)
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", "fig7_digitized.png")
+    png = os.path.join(HERE, "..", "figures", "geometry", "fig7_digitized.png")
     fig.savefig(png, dpi=130)
     print(f"saved {os.path.normpath(png)}")
 

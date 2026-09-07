@@ -90,7 +90,7 @@ def main():
     ap.add_argument("--cases", default="100:30,500:120",
                     help="Re:長さ[w_v] をカンマ区切り")
     ap.add_argument("--iters", type=int, default=800000)
-    ap.add_argument("--out", default="results/io_bc_validation.json")
+    ap.add_argument("--out", default="results/validation/io_bc_validation.json")
     a = ap.parse_args()
 
     print("=" * 86)

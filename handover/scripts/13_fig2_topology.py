@@ -44,7 +44,7 @@ from scipy import ndimage as ndi
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 IMG = os.path.join(HERE, "..", "docs", "gamboa2005_fig2.png")
-OUT = os.path.join(HERE, "..", "results", "fig2_topology.json")
+OUT = os.path.join(HERE, "..", "results", "geometry", "fig2_topology.json")
 
 # 2026-08-09 の実測値（docs/gamboa2005_geometry.md 5.2）
 W_PX_REF = 44.50
@@ -246,7 +246,7 @@ def main():
     ax.set_xlim(0, W); ax.set_ylim(H, 0)
     ax.set_title("Fig.2 optimized: red = loop branch fit, blue = outlet fit")
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", "fig2_topology.png")
+    png = os.path.join(HERE, "..", "figures", "geometry", "fig2_topology.png")
     fig.savefig(png, dpi=130)
     print(f"saved {os.path.normpath(png)}")
 

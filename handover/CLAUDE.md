@@ -54,6 +54,16 @@ Fig.2 の画素実測で位相を確定させ、忠実形状 + 入口出口 BC �
 9. 正則化 BC（Latt 2008）は本ソルバでは**逆に不安定**（TRT の奇数非平衡成分を捨てるため）
 10. 入口・出口の **BC 列（i=0, nx−1）の断面流量は内部と一致しない**。質量保存は内部で見る
 
+## ディレクトリの見方
+
+- `scripts/README.md` … スクリプトの用途別一覧（検証 / 幾何 / 流れ / 図 / CAD）
+- `results/README.md` … 結果の分類（validation, geometry, single, periodic, cad）
+- `figures/README.md` … 図の分類（geometry, flow）
+- `cad/INDEX.md` … **CAD ファイル名と形の対応表**（`figures/geometry/cad_index.png`）
+
+**`results/single/`（案 1、プレナム込み単発）と `results/periodic/`（案 2、周期セル）を
+混同しないこと。** Gamboa Fig.7 と比べるのは single。
+
 ## ファイルの役割
 
 | パス | 役割 |

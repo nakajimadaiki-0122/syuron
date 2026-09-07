@@ -64,7 +64,7 @@ def main():
     ap.add_argument("--U", type=float, default=0.05)
     ap.add_argument("--gaps", type=float, nargs="+", default=[1.0, 3.0])
     ap.add_argument("--iters", type=int, default=3_000_000)
-    ap.add_argument("--out", default="results/gamboa_case2.json")
+    ap.add_argument("--out", default="results/periodic/gamboa_case2.json")
     a = ap.parse_args()
     w_mm = 1.0
     th = G.theta_from_params(G.OPTIMIZED["X2"], G.OPTIMIZED["n"], G.OPTIMIZED["Y3"])
@@ -136,7 +136,7 @@ def main():
               f"{'合格' if max(dv)-min(dv) < 0.005 else '要確認'}")
         out["Di_valve_spread"] = float(max(dv) - min(dv))
 
-    os.makedirs("results", exist_ok=True)
+    os.makedirs("results/periodic", exist_ok=True)
     json.dump(out, open(a.out, "w"), indent=1, default=str)
     print(f"\nsaved {a.out}")
 

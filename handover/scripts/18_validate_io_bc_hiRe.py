@@ -71,7 +71,7 @@ def main():
     ap.add_argument("--L", type=float, default=20.0)
     ap.add_argument("--Re", default="100,300,500,1000")
     ap.add_argument("--iters", type=int, default=400000)
-    ap.add_argument("--out", default="results/io_bc_validation_hiRe.json")
+    ap.add_argument("--out", default="results/validation/io_bc_validation_hiRe.json")
     a = ap.parse_args()
 
     print("=" * 84)

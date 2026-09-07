@@ -29,7 +29,7 @@ from scipy import ndimage as ndi
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 IMG = os.path.join(HERE, "..", "docs", "gamboa2005_fig2.png")
-OUT = os.path.join(HERE, "..", "results", "fig2_plenum.json")
+OUT = os.path.join(HERE, "..", "results", "geometry", "fig2_plenum.json")
 
 
 def masks():
@@ -149,8 +149,7 @@ def main():
     # 出口中心線: 点 J0 を通り方向 (cos(-48.03), sin(-48.03))
     ev = np.array([np.cos(-alpha_axis), np.sin(-alpha_axis)])
     # 13 の実測から出口区間の左右壁の中点直線（w_v 系）を作る
-    top = json.load(open(os.path.join(HERE, "..", "results",
-                                      "fig2_topology.json")))
+    top = json.load(open(os.path.join(HERE, "..", "results", "geometry", "fig2_topology.json")))
     cmid = np.array(top["bands"]["outlet_segment"]["mid"]["c"])   # px
     cmidv = np.array(wv(*cmid))
     t = np.dot(cRv - cmidv, ev)
@@ -185,7 +184,7 @@ def main():
     ax.set_xlim(0, W); ax.set_ylim(H, 0)
     ax.set_title("Fig.2: plenum circle fits")
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", "fig2_plenum.png")
+    png = os.path.join(HERE, "..", "figures", "geometry", "fig2_plenum.png")
     fig.savefig(png, dpi=130)
     print(f"saved {os.path.normpath(png)}")
 

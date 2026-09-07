@@ -61,7 +61,7 @@ def main():
     ap.add_argument("--Re", type=float, default=100.0)
     ap.add_argument("--cells", type=int, default=20, help="短辺のセル数")
     ap.add_argument("--aspects", default="1,2,4")
-    ap.add_argument("--out", default="results/validate_3d.json")
+    ap.add_argument("--out", default="results/validation/validate_3d.json")
     a = ap.parse_args()
 
     print("=" * 78)

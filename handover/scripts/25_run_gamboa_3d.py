@@ -84,8 +84,7 @@ def main():
                       f"質量ばらつき={spread:.2e}", flush=True)
 
         t0 = time.time()
-        ck = os.path.join(HERE, "..", "results",
-                          f"ck3d_{lab}_Re{int(a.Re)}_cpm{a.cpm}.npy")
+        ck = os.path.join(HERE, "..", "results", "single", f"ck3d_{lab}_Re{int(a.Re)}_cpm{a.cpm}.npy")
         ux, uy, uz, rho, p, f, inf = L3.solve_flow_io(
             m, nu, U_in, iters=a.iters, dp_window=a.dp_window, report=rep,
             ckpt=ck)
@@ -107,16 +106,14 @@ def main():
         if os.path.exists(ck):
             os.remove(ck)
         if a.save_fields:
-            npz = os.path.join(HERE, "..", "results",
-                               f"gamboa3d_Re{int(a.Re)}_cpm{a.cpm}_{lab}.npz")
+            npz = os.path.join(HERE, "..", "results", "single", f"gamboa3d_Re{int(a.Re)}_cpm{a.cpm}_{lab}.npz")
             np.savez_compressed(npz, ux=ux.astype(np.float32),
                                 uy=uy.astype(np.float32),
                                 uz=uz.astype(np.float32),
                                 p=p.astype(np.float32), mask=m, xs=xs, ys=ys)
             print(f"  saved {os.path.normpath(npz)}", flush=True)
 
-    o = a.out or os.path.join(HERE, "..", "results",
-                              f"gamboa3d_Re{int(a.Re)}_cpm{a.cpm}"
+    o = a.out or os.path.join(HERE, "..", "results", "single", f"gamboa3d_Re{int(a.Re)}_cpm{a.cpm}"
                               + ("" if a.dir == "both" else f"_{a.dir}")
                               + ".json")
     if a.dir != "both":
@@ -131,8 +128,7 @@ def main():
         out["Di"] = out["rev"]["dp_Pa"] / out["fwd"]["dp_Pa"]
         print(f"\n  Di(3D) = {out['rev']['dp_Pa']:.4f} / "
               f"{out['fwd']['dp_Pa']:.4f} = {out['Di']:.4f}")
-        two = os.path.join(HERE, "..", "results",
-                           f"gamboa_full_Re{int(a.Re)}_cpm16_fwd.json")
+        two = os.path.join(HERE, "..", "results", "single", f"gamboa_full_Re{int(a.Re)}_cpm16_fwd.json")
         if os.path.exists(two):
             j = json.load(open(two))
             if "Di" in j:

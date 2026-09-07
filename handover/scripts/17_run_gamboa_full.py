@@ -128,8 +128,7 @@ def main():
     if a.dir != "both":
         todo = [t for t in todo if t[0] == a.dir]
     for lab, m in todo:
-        ck = os.path.join(HERE, "..", "results",
-                          f"ck_full_{lab}_Re{int(a.Re)}_cpm{a.cpm}.npy")
+        ck = os.path.join(HERE, "..", "results", "single", f"ck_full_{lab}_Re{int(a.Re)}_cpm{a.cpm}.npy")
         r, ux, uy, p, rho = solve_one(m, a.Re, a.U, a.cpm, lab, a.iters,
                                       a.tol, ckpt=ck, w_mm=w_mm,
                                       dp_tol=a.dp_tol, dp_window=a.dp_window,
@@ -143,8 +142,7 @@ def main():
         if os.path.exists(ck):
             os.remove(ck)
 
-    o = a.out or os.path.join(HERE, "..", "results",
-                              f"gamboa_full_Re{int(a.Re)}_cpm{a.cpm}"
+    o = a.out or os.path.join(HERE, "..", "results", "single", f"gamboa_full_Re{int(a.Re)}_cpm{a.cpm}"
                               + ("" if a.dir == "both" else f"_{a.dir}")
                               + ".json")
     if a.dir != "both":
@@ -212,8 +210,7 @@ def main():
     fig.suptitle(f"Gamboa full model  Di = {Di:.4f}"
                  + (f"  (Fig.7: {tgt})" if tgt else ""))
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures",
-                       f"gamboa_full_Re{int(a.Re)}_cpm{a.cpm}.png")
+    png = os.path.join(HERE, "..", "figures", "flow", f"gamboa_full_Re{int(a.Re)}_cpm{a.cpm}.png")
     fig.savefig(png, dpi=130)
     print(f"saved {os.path.normpath(png)}")
 

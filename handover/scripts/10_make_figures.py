@@ -28,7 +28,7 @@ CUT = {12: 125, 24: 251, 48: 502}       # 直線区間で切った窓
 def july_di():
     """7 月形状の Di_p。cpm ごとに Re をまとめる。"""
     out = {}
-    for f in glob.glob("results/cell_tesla_channel_cell_fwd_Re*_cpm*_o*.json"):
+    for f in glob.glob("results/periodic/cell_tesla_channel_cell_fwd_Re*_cpm*_o*.json"):
         if "_tight" in f:
             continue
         j = json.load(open(f))
@@ -38,7 +38,7 @@ def july_di():
             continue
         out.setdefault(cpm, {})[Re] = json.load(open(r))["dp_Pa"] / j["dp_Pa"]
     # 旧タグ（cpm 無し）も拾う
-    for f in glob.glob("results/cell_tesla_channel_cell_fwd_Re*_o145.json"):
+    for f in glob.glob("results/periodic/cell_tesla_channel_cell_fwd_Re*_o145.json"):
         j = json.load(open(f))
         Re = int(j["Re"])
         r = f.replace("_fwd_", "_rev_")
@@ -47,7 +47,7 @@ def july_di():
     return out
 
 
-def fig_di_vs_re(july, path="figures/di_vs_re.png"):
+def fig_di_vs_re(july, path="figures/flow/di_vs_re.png"):
     fig, ax = plt.subplots(1, 2, figsize=(11, 4.4),
                            gridspec_kw={"width_ratios": [1, 1]})
 
@@ -84,12 +84,13 @@ def fig_di_vs_re(july, path="figures/di_vs_re.png"):
     ax[1].set_title("(b) close-up near $Di_p = 1$", fontsize=10, loc="left")
     ax[1].legend(fontsize=7.5); ax[1].grid(alpha=.3)
 
-    os.makedirs("figures", exist_ok=True)
+    os.makedirs("figures/flow", exist_ok=True)
+    os.makedirs("figures/geometry", exist_ok=True)
     plt.tight_layout(); plt.savefig(path, dpi=160)
     print(f"saved {path}")
 
 
-def fig_angle(path="figures/junction_angle.png"):
+def fig_angle(path="figures/geometry/junction_angle.png"):
     """接合角の比較。上流側接合での「主流路 -> ループ」向きを矢印で示す。"""
     shapes = [("July shape\n(this work, measured)", 47.4, "C3"),
               ("Gamboa reference", 98.5, "C0"),
@@ -144,7 +145,7 @@ def table(july, path="figures/summary_table.md"):
               "| 7 月形状（DXF 実測） | 47.4 | −42.6 | 47.4° | 並列バイパス |",
               "| Gamboa reference | 98.5 | +8.5 | 98.5° | 対向 |",
               "| Gamboa optimized | 161.6 | +71.6 | 161.6° | 対向 |", ""]
-    open(path, "w").write("\n".join(lines))
+    open(path, "w", encoding="utf-8").write("\n".join(lines))
     print(f"saved {path}")
 
 

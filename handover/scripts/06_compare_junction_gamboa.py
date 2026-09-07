@@ -36,7 +36,7 @@ def gamboa_theta(X2, n, Y3):
 
 
 def main():
-    res = json.load(open("results/loop_junction_angles.json"))
+    res = json.load(open("results/geometry/loop_junction_angles.json"))
 
     print("=" * 78)
     print(" 換算式の検証: beta = theta - 90 が Gamboa Table 2 を再現するか")
@@ -85,7 +85,7 @@ def main():
         print(f"{name:>22}{th:>14.2f}{be:>13.2f}{ang:>18.2f}{verdict:>16}")
 
     # ---- 作図 ----
-    d = np.load("results/loop1_centerline.npz")
+    d = np.load("results/geometry/loop1_centerline.npz")
     C, arc, flank, valid = d["C"], d["arc"], d["flank"], d["valid"]
     k = np.flatnonzero(valid)
     Cv = C[k.min():k.max() + 1]
@@ -125,8 +125,8 @@ def main():
     ax.set_title("July geometry, loop 1: loop centreline / main-channel junction "
                  "(measured from DXF)", fontsize=11, loc="left")
     ax.legend(fontsize=8, loc="lower right"); ax.grid(alpha=.25)
-    os.makedirs("figures", exist_ok=True)
-    plt.tight_layout(); plt.savefig("figures/loop_junction_angle.png", dpi=150)
+    os.makedirs("figures/geometry", exist_ok=True)
+    plt.tight_layout(); plt.savefig("figures/geometry/loop_junction_angle.png", dpi=150)
     print("\nsaved figures/loop_junction_angle.png")
 
 

@@ -204,7 +204,7 @@ def main():
     print("\n  " + ("すべて閉じたメッシュ（非多様体辺なし）。"
                     "3D プリント・CAD 取り込み可。" if ok
                     else "**非多様体辺がある。修正が要る。**"))
-    j = os.path.join(HERE, "..", "results", "cad_models.json")
+    j = os.path.join(HERE, "..", "results", "cad", "cad_models.json")
     json.dump(dict(wv_mm=wv, depth_mm=depth, wall_mm=a.wall_mm,
                    margin_mm=a.margin_mm, port_mm=a.port_mm,
                    ports=[list(p) for p in ports], plate_extent=list(ext),

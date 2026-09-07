@@ -141,7 +141,7 @@ def main():
     ok = all(r["watertight"] for r in recs)
     print("\n" + ("すべて閉じたメッシュ。CAD 取り込み可。" if ok
                   else "**非多様体のモデルがある**"))
-    j = os.path.join(HERE, "..", "results", "cad_variants.json")
+    j = os.path.join(HERE, "..", "results", "cad", "cad_variants.json")
     json.dump(dict(wv_mm=wv, depth_mm=depth, wall_mm=a.wall_mm,
                    port_mm=a.port_mm, pad_r_mm=pad_r, sizes=SIZES,
                    stages=a.stages, loops=a.loops, gap=a.gap,
@@ -169,7 +169,7 @@ def main():
     fig.suptitle("channel variants (top 3: staircase, bottom 6: straight + side bumps)",
                  fontsize=10)
     fig.tight_layout()
-    png = os.path.join(HERE, "..", "figures", "variants.png")
+    png = os.path.join(HERE, "..", "figures", "geometry", "variants.png")
     fig.savefig(png, dpi=130)
     print(f"saved {os.path.normpath(png)}")
 

@@ -53,7 +53,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fwd", required=True)
     ap.add_argument("--rev", required=True)
-    ap.add_argument("--out", default="figures/field.png")
+    ap.add_argument("--out", default="figures/flow/field.png")
     ap.add_argument("--Re", type=float, default=100.0)
     ap.add_argument("--W", type=float, default=1.0)
     ap.add_argument("--U", type=float, default=0.05)

@@ -90,8 +90,8 @@ def main():
                        nx=int(mask.shape[0]), ny=int(mask.shape[1]),
                        fluid=int(mask.sum()))
 
-    out = a.out or f"results/gamboa_diag_Re{int(a.Re)}_cpm{a.cpm}.json"
-    os.makedirs("results", exist_ok=True)
+    out = a.out or f"results/periodic/gamboa_diag_Re{int(a.Re)}_cpm{a.cpm}.json"
+    os.makedirs("results/periodic", exist_ok=True)
     json.dump(res, open(out, "w"), indent=1, default=float)
     print(f"saved {out}")
 
@@ -125,8 +125,8 @@ def main():
     ax.set_xlabel("i (格子, 駆動方向 +x)"); ax.set_ylabel("phi_loop")
     ax.legend(); ax.grid(alpha=0.3)
     fig.tight_layout()
-    png = out.replace("results/", "figures/").replace(".json", ".png")
-    os.makedirs("figures", exist_ok=True)
+    png = out.replace("results/periodic/", "figures/flow/").replace(".json", ".png")
+    os.makedirs("figures/flow", exist_ok=True)
     fig.savefig(png, dpi=130)
     print(f"saved {png}")
 
