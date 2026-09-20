@@ -9,3 +9,8 @@
     it=  10000 res=4.84e-04 dp=7.623029e-02 質量ばらつき=5.39e-02
     it=  15000 res=1.34e-04 dp=8.003327e-02 質量ばらつき=7.68e-03
     it=  20000 res=8.71e+00 dp=8.057596e-02 質量ばらつき=1.19e-03
+    it=  25000 res=9.28e+00 dp=8.066501e-02 質量ばらつき=3.03e-04
+    it=  30000 res=8.71e+00 dp=8.067841e-02 質量ばらつき=1.24e-04
+    it=  35000 res=9.29e+00 dp=8.067971e-02 質量ばらつき=6.97e-05
+  [fwd] dp = 59.1587 ± 0.0016 Pa, 収束 True（非定常） it=36801 質量ばらつき=1.1e-04 239 分
+saved C:\Users\n_dai\OneDrive\ドキュメント\GitHub\syuron\handover\results\single\variant_stair4_large_3d_Re100_cpm6_fwd.json
