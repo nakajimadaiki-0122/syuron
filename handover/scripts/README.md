@@ -59,5 +59,6 @@ cd handover
 | `22_make_chain.py` | **段々流路**（任意の段数、こぶの大きさ） |
 | `26_make_variants.py` | **試作用の変種一式**（段々 / 側面こぶ × 大きさ 3 通り） |
 | `27_cad_index.py` | `cad/INDEX.md` と `figures/geometry/cad_index.png` を作り直す |
+| `31_make_xia2025.py` | **Xia et al. (2025) Fig.3 の 4 構成**（TVM / SYMTVM × Forward / Reverse）の STL・DXF → `cad/xia2025/` |
 
 出力の命名規則は `cad/README.md` を参照。

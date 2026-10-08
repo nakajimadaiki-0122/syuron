@@ -132,8 +132,12 @@ Gamboa の 2D CFD（Di = 1.37）に対する強度は次のとおり。
 
 ## 4. Porwal (2016) M.S. Thesis
 
-**[調査報告]** `docs/porwal2016_thesis.pdf`（60 ページ、Mississippi State Univ.）。
-本セッションでは表紙のみ確認しており、以下の数値は過去の調査による。
+**[原典確認]** 書誌（表紙から）: Porwal, Piyush. *Thermal and fluidic characterization of
+Tesla valve via computational fluid dynamics*. M.S. Thesis, Department of Mechanical
+Engineering, Mississippi State University, May 2016. ProQuest No. 10100411. 60 ページ。
+`docs/porwal2016_thesis.pdf`（ワークスペース直下の `Thermal_and_fluidic_characteri.pdf` と同一）。
+
+**[調査報告]** 表紙のみ確認しており、以下の数値は過去の調査による。
 
 | Re | Nu 順流 | Nu 逆流 | Nu_rev/Nu_fwd | Di_p（最終段） |
 |---|---|---|---|---|

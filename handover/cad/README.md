@@ -28,6 +28,17 @@
 | `_plate.stl` | 溝を彫った板（裏面にポート穴）。実物モデル |
 | `_lid.stl` | 蓋（平板）。板と貼り合わせると流路が閉じる |
 
+## 先行研究の形状 `xia2025/`（2026-10-08）
+
+    xia2025_{symtvm,tvm}_{fwd,rev}_{fluid.stl | block.stl | outline.dxf}
+
+Xia et al. (2025, Appl. Therm. Eng. 258, 124611) Fig. 3 の 4 構成。
+`fluid` は流体体積（z = 0.5〜2.0 mm）、`block` は計算単位 50 × 3.54 × 2 mm に流路を深さ 1.5 で
+彫ったもの（入口・出口は端面に開口）、`outline` は流路の 2D 輪郭。
+Fusion 360 では STL を「挿入 > メッシュを挿入」で読むか、DXF を「挿入 > DXF を挿入」で
+スケッチにして 1.5 mm 押し出す（面付きソリッドが要るときは後者が速い）。
+寸法の来歴と合わない点は `docs/xia2025_geometry.md`、生成は `scripts/31_make_xia2025.py`。
+
 ## 作り直し方
 
 既定は流路幅 w_v = 1.0 mm、深さ 1.0 mm（正方形断面）、溝の下の肉厚 1.0 mm、

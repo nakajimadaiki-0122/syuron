@@ -101,3 +101,58 @@ def port_pads(poly, pts, pad_r, resolution=48):
     """流路の端に丸い溜まりを付ける（細い流路にポートを収めるため）。"""
     return unary_union([poly] + [Point(*p).buffer(pad_r, resolution=resolution)
                                  for p in pts])
+
+
+# ---------------------------------------------------------------------------
+# 切断つきの押し出し（穴の多い多角形用、2026-10-08）
+# ---------------------------------------------------------------------------
+def _pieces(region, cuts):
+    """領域を x = cuts の鉛直線で切った小片のリスト。各小片は clean_polygon 済み。"""
+    xs = [-1e9] + sorted(cuts) + [1e9]
+    ymin = region.bounds[1] - 1.0
+    ymax = region.bounds[3] + 1.0
+    out = []
+    for a, b in zip(xs[:-1], xs[1:]):
+        part = region.intersection(box(a, ymin, b, ymax))
+        geoms = part.geoms if part.geom_type == "MultiPolygon" else [part]
+        for g in geoms:
+            if g.geom_type == "Polygon" and g.area > 1e-12:
+                out.append(M.clean_polygon(g))
+    return out
+
+
+def _on_cut(a, b, cuts, tol=1e-9):
+    return any(abs(a[0] - c) < tol and abs(b[0] - c) < tol for c in cuts)
+
+
+def caps_cut(region, z, up, cuts):
+    """z 一定の面を、小片ごとに三角形分割して返す。"""
+    out = []
+    for g in _pieces(region, cuts):
+        out += cap(g, z, up)
+    return out
+
+
+def walls_cut(region, z0, z1, cuts, outward):
+    """小片の輪郭を z0..z1 へ押し出した側壁。切断線上の辺は出さない。
+
+    outward=True で法線が領域の外を向く（流体の立体）。False で内側
+    （固体に彫った溝の壁）。穴の輪郭も同じ規則で扱う。
+    """
+    out = []
+    for g in _pieces(region, cuts):
+        rings = [(closed(g.exterior, True), True)] + [(closed(r, False), True) for r in g.interiors]
+        for P, _ in rings:
+            for a, b in zip(P[:-1], P[1:]):
+                if _on_cut(a, b, cuts):
+                    continue
+                q = [(a[0], a[1], z0), (b[0], b[1], z0), (b[0], b[1], z1), (a[0], a[1], z1)]
+                t = [[q[0], q[1], q[2]], [q[0], q[2], q[3]]]
+                out += t if outward else [u[::-1] for u in t]
+    return out
+
+
+def fluid_solid_cut(poly, z0, z1, cuts):
+    """`fluid_solid` の切断版。z0..z1 に押し出す。"""
+    return (caps_cut(poly, z0, False, cuts) + caps_cut(poly, z1, True, cuts)
+            + walls_cut(poly, z0, z1, cuts, True))

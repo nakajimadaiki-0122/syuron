@@ -12,7 +12,8 @@
 | `CLAUDE.md` | Claude Code 用の要約コンテキスト |
 | `docs/gamboa2005_geometry.md` | Gamboa 幾何の読解と逆算。確定／未確定を明示 |
 | `docs/literature_findings.md` | 先行研究調査の知見。出典の来歴を明示 |
-| `progress/YYYY-MM-DD.md` | セッションごとの作業記録。最新は **2026-09-21** |
+| `docs/xia2025_geometry.md` | Xia 2025（対称 Tesla 型）の幾何の読解。`cad/xia2025/` の 4 構成の根拠 |
+| `progress/YYYY-MM-DD.md` | セッションごとの作業記録。最新は **2026-10-08** |
 
 ワークスペース直下の `../HANDOFF.md` と `../VSCODE_START_PROMPT.md` は 2026-08-09 以前の
 もので、**本ファイルが置き換えます**（あちらの「案 2 で進める」という指示はもう無効）。
