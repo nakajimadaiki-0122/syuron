@@ -205,9 +205,11 @@ def main():
             mdot = a.U * A
             print(f"  [{lab}] 体積力駆動、断面の流体 {A:.0f} セル", flush=True)
 
-            def repp(it, d, g):
+            def repp(it, d, g, err):
+                # lbm3d.solve_duct_periodic は (it, 残差, G, 流量誤差) を渡す
                 if it % 5000 == 0:
-                    print(f"    it={it:7d} res={d:.2e} G={g:.4e}", flush=True)
+                    print(f"    it={it:7d} res={d:.2e} G={g:.4e} "
+                          f"流量誤差={err:+.2e}", flush=True)
 
             if a.dim == 2:
                 raise SystemExit("periodic は 3 次元用（2 次元は io を使う）")
@@ -217,8 +219,11 @@ def main():
             dp_std = 0.0
             conv, unsteady = inf["converged"], False
             spread = float("nan")
-            resid = inf.get("residual", float("nan"))
+            resid = float("nan")
             iters = inf["iters"]
+            out.setdefault("periodic_info", {})[lab] = dict(
+                G=float(inf["G"]), mdot=float(inf["mdot"]),
+                mdot_target=float(mdot), tau_p=float(inf["tau_p"]))
         else:
             n_in = int(m[0].sum())
             U_in = a.U
