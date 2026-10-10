@@ -489,7 +489,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2461324.5271180556
+2461324.531215278
   9
 $TDUCREATE
  40
@@ -497,7 +497,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2461324.5271180556
+2461324.531215278
   9
 $TDUUPDATE
  40
@@ -549,7 +549,7 @@ $SPLINESEGS
   9
 $HANDSEED
   5
-54
+5F
   9
 $SURFTAB1
  70
@@ -929,11 +929,11 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{8FB7C63A-9355-4628-AD89-F7BAA19C782B}
+{325C158E-9957-4A93-895D-904BAA47F969}
   9
 $VERSIONGUID
   2
-{5FA71DB0-FFD9-448A-9D96-EA6EAFA53F76}
+{33C96496-2569-40E3-BBFB-585633D12D7B}
   9
 $EXTNAMES
 290
@@ -1549,7 +1549,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-4
+7
   0
 LAYER
   5
@@ -1611,11 +1611,11 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-OUTER
+BLOCK
  70
 0
  62
-5
+7
   6
 Continuous
 370
@@ -1635,11 +1635,83 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
+CHANNEL
+ 70
+0
+ 62
+5
+  6
+Continuous
+370
+-3
+390
+13
+347
+21
+  0
+LAYER
+  5
+31
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
 ISLAND
  70
 0
  62
 1
+  6
+Continuous
+370
+-3
+390
+13
+347
+21
+  0
+LAYER
+  5
+32
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+LID
+ 70
+0
+ 62
+8
+  6
+Continuous
+370
+-3
+390
+13
+347
+21
+  0
+LAYER
+  5
+33
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+NOTE
+ 70
+0
+ 62
+2
   6
 Continuous
 370
@@ -1749,7 +1821,7 @@ ACAD
   0
 APPID
   5
-51
+5C
 330
 3
 100
@@ -1763,7 +1835,7 @@ HATCHBACKGROUNDCOLOR
   0
 APPID
   5
-52
+5D
 330
 3
 100
@@ -2073,13 +2145,51 @@ ENTITIES
   0
 LWPOLYLINE
   5
-31
+34
 330
 17
 100
 AcDbEntity
   8
-OUTER
+BLOCK
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+0.0
+ 20
+1.77
+ 10
+50.0
+ 20
+1.77
+ 10
+50.0
+ 20
+-1.77
+ 10
+0.0
+ 20
+-1.77
+210
+0.0
+220
+-1.0
+230
+0.0
+  0
+LWPOLYLINE
+  5
+35
+330
+17
+100
+AcDbEntity
+  8
+CHANNEL
 100
 AcDbPolyline
  90
@@ -6735,7 +6845,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-32
+36
 330
 17
 100
@@ -7029,7 +7139,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-33
+37
 330
 17
 100
@@ -7327,7 +7437,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-34
+38
 330
 17
 100
@@ -7625,7 +7735,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-35
+39
 330
 17
 100
@@ -7923,7 +8033,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-36
+3A
 330
 17
 100
@@ -8221,7 +8331,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-37
+3B
 330
 17
 100
@@ -8259,7 +8369,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-38
+3C
 330
 17
 100
@@ -8297,7 +8407,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-39
+3D
 330
 17
 100
@@ -8335,7 +8445,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-3A
+3E
 330
 17
 100
@@ -8373,7 +8483,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-3B
+3F
 330
 17
 100
@@ -8411,7 +8521,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-3C
+40
 330
 17
 100
@@ -8709,7 +8819,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-3D
+41
 330
 17
 100
@@ -9007,7 +9117,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-3E
+42
 330
 17
 100
@@ -9305,7 +9415,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-3F
+43
 330
 17
 100
@@ -9603,7 +9713,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-40
+44
 330
 17
 100
@@ -9901,7 +10011,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-41
+45
 330
 17
 100
@@ -10199,7 +10309,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-42
+46
 330
 17
 100
@@ -10497,7 +10607,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-43
+47
 330
 17
 100
@@ -10795,7 +10905,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-44
+48
 330
 17
 100
@@ -11093,7 +11203,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-45
+49
 330
 17
 100
@@ -11391,7 +11501,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-46
+4A
 330
 17
 100
@@ -11429,7 +11539,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-47
+4B
 330
 17
 100
@@ -11467,7 +11577,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-48
+4C
 330
 17
 100
@@ -11505,7 +11615,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-49
+4D
 330
 17
 100
@@ -11543,7 +11653,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-4A
+4E
 330
 17
 100
@@ -11581,7 +11691,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-4B
+4F
 330
 17
 100
@@ -11879,7 +11989,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-4C
+50
 330
 17
 100
@@ -12177,7 +12287,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-4D
+51
 330
 17
 100
@@ -12475,7 +12585,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-4E
+52
 330
 17
 100
@@ -12773,7 +12883,7 @@ AcDbPolyline
   0
 LWPOLYLINE
   5
-4F
+53
 330
 17
 100
@@ -13069,31 +13179,285 @@ AcDbPolyline
 230
 0.0
   0
-TEXT
+LWPOLYLINE
   5
-50
+54
 330
 17
 100
 AcDbEntity
   8
-OUTER
+LID
+100
+AcDbPolyline
+ 90
+4
+ 70
+1
+ 10
+0.0
+ 20
+-1.97
+ 10
+50.0
+ 20
+-1.97
+ 10
+50.0
+ 20
+-5.51
+ 10
+0.0
+ 20
+-5.51
+210
+0.0
+220
+-1.0
+230
+0.0
+  0
+TEXT
+  5
+55
+330
+17
+100
+AcDbEntity
+  8
+NOTE
 100
 AcDbText
  10
 0.0
  20
--2.2
+-9.26
  30
 0.0
  40
-0.5
+0.28
   1
-SYMTVM-Forward  Xia et al. 2025 ATE 258 124611 Fig.3/4  unit mm  [Y-up: XZ plane]
+SYMTVM-Forward   Xia et al. 2025 ATE 258 124611  Fig.3/Fig.4  unit: mm
  11
 0.0
  21
--2.2
+-9.26
+ 31
+0.0
+210
+0.0
+220
+-1.0
+230
+0.0
+100
+AcDbText
+  0
+TEXT
+  5
+56
+330
+17
+100
+AcDbEntity
+  8
+NOTE
+100
+AcDbText
+ 10
+0.0
+ 20
+-8.809999999999999
+ 30
+0.0
+ 40
+0.28
+  1
+BLOCK  : extrude 2        (H, full plate height)
+ 11
+0.0
+ 21
+-8.809999999999999
+ 31
+0.0
+210
+0.0
+220
+-1.0
+230
+0.0
+100
+AcDbText
+  0
+TEXT
+  5
+57
+330
+17
+100
+AcDbEntity
+  8
+NOTE
+100
+AcDbText
+ 10
+0.0
+ 20
+-8.36
+ 30
+0.0
+ 40
+0.28
+  1
+CHANNEL: cut 1.5 from top (Hch). floor left = 0.5
+ 11
+0.0
+ 21
+-8.36
+ 31
+0.0
+210
+0.0
+220
+-1.0
+230
+0.0
+100
+AcDbText
+  0
+TEXT
+  5
+58
+330
+17
+100
+AcDbEntity
+  8
+NOTE
+100
+AcDbText
+ 10
+0.0
+ 20
+-7.909999999999999
+ 30
+0.0
+ 40
+0.28
+  1
+ISLAND : do NOT cut (pillars, full 1.5 tall inside the groove)
+ 11
+0.0
+ 21
+-7.909999999999999
+ 31
+0.0
+210
+0.0
+220
+-1.0
+230
+0.0
+100
+AcDbText
+  0
+TEXT
+  5
+59
+330
+17
+100
+AcDbEntity
+  8
+NOTE
+100
+AcDbText
+ 10
+0.0
+ 20
+-7.459999999999999
+ 30
+0.0
+ 40
+0.28
+  1
+LID    : extrude 1        (cover plate, optional)
+ 11
+0.0
+ 21
+-7.459999999999999
+ 31
+0.0
+210
+0.0
+220
+-1.0
+230
+0.0
+100
+AcDbText
+  0
+TEXT
+  5
+5A
+330
+17
+100
+AcDbEntity
+  8
+NOTE
+100
+AcDbText
+ 10
+0.0
+ 20
+-7.01
+ 30
+0.0
+ 40
+0.28
+  1
+-> the resulting cross-section matches {tag}_section.dxf (Fig.1c/f)
+ 11
+0.0
+ 21
+-7.01
+ 31
+0.0
+210
+0.0
+220
+-1.0
+230
+0.0
+100
+AcDbText
+  0
+TEXT
+  5
+5B
+330
+17
+100
+AcDbEntity
+  8
+NOTE
+100
+AcDbText
+ 10
+0.0
+ 20
+-6.56
+ 30
+0.0
+ 40
+0.28
+  1
+placed on the XZ plane (Y is vertical, extrude along +Y)
+ 11
+0.0
+ 21
+-6.56
  31
 0.0
 210
@@ -14095,7 +14459,7 @@ CREATED_BY_EZDXF
   3
 WRITTEN_BY_EZDXF
 350
-53
+5E
   0
 DICTIONARYVAR
   5
@@ -14107,11 +14471,11 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-10-10T03:39:03.033966+00:00
+1.4.4 @ 2026-10-10T03:44:57.766582+00:00
   0
 DICTIONARYVAR
   5
-53
+5E
 330
 2D
 100
@@ -14119,7 +14483,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-10-10T03:39:03.042372+00:00
+1.4.4 @ 2026-10-10T03:44:57.775606+00:00
   0
 ENDSEC
   0

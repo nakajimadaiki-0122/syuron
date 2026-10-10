@@ -65,36 +65,65 @@ TAGS = {"SYMTVM-Forward": "xia2025_symtvm_fwd", "SYMTVM-Reverse": "xia2025_symtv
         "TVM-Forward": "xia2025_tvm_fwd", "TVM-Reverse": "xia2025_tvm_rev"}
 
 
-def write_dxf_ezdxf(path, rings, name, up="y"):
-    """閉じた LWPOLYLINE の DXF（R2010、単位 mm）。Fusion 360 の「DXF を挿入」用。
+def write_dxf_ezdxf(path, rings, name, up, length, w_unit, h, h_ch, t_lid):
+    """押し出すと断面が Fig.1(c)(f) になる DXF（R2010、単位 mm）。
 
-    `mesh.write_dxf` の最小実装は閉じフラグが読まれない環境があるので、ここでは ezdxf で書く。
-    外形はレイヤ OUTER、島は ISLAND。
+    **流体の輪郭だけを入れても高さ 2・深さ 1.5 の部品にはならない。**
+    そこで押し出しに要る輪郭をレイヤで分けて入れる。
 
-    up="y" のときは押し出し方向を (0, −1, 0) にして **XZ 平面（地面）** に載せる。
-    DXF の任意軸アルゴリズムにより OCS の (u, v) が世界座標 (u, 0, v) に対応するので、
+    | レイヤ | 輪郭 | CAD での操作 |
+    |---|---|---|
+    | `BLOCK` | 計算単位の外形 50 x 3.54 | 押し出し **2.0**（= H） |
+    | `CHANNEL` | 流路の外周 | 上面から **1.5**（= Hch）切り取り |
+    | `ISLAND` | 島 | 切り取らない（柱として残る） |
+    | `LID` | 外形と同じ矩形（0.2 だけ離して置く） | 押し出し **1.0**（蓋。任意） |
+
+    CHANNEL と ISLAND の間の領域を切り取り profile に選べば、島は残り、
+    底には h − h_ch = 0.5 の固体が残る。**その断面が `_section.dxf` と一致する。**
+
+    up="y" のときは押し出し方向 (0, −1, 0) の OCS にして **XZ 平面（地面）** に載せる。
+    任意軸アルゴリズムで OCS の (u, v) が世界座標 (u, 0, v) に対応するので、
     v = −y と書けば STL（`to_yup`）と同じ位置・同じ向きになる。
     """
     import ezdxf
     doc = ezdxf.new("R2010")
     doc.header["$INSUNITS"] = 4
-    doc.layers.add("OUTER", color=5)
-    doc.layers.add("ISLAND", color=1)
+    for lay, col in (("BLOCK", 7), ("CHANNEL", 5), ("ISLAND", 1),
+                     ("LID", 8), ("NOTE", 2)):
+        doc.layers.add(lay, color=col)
     msp = doc.modelspace()
     sy = -1.0 if up == "y" else 1.0           # OCS 上の v = −y（up="y" のとき）
     ext = {"extrusion": (0.0, -1.0, 0.0)} if up == "y" else {}
-    n = 0
+    hw = 0.5 * w_unit
+
+    def poly(pts, layer):
+        msp.add_lwpolyline([(float(x), sy * float(y)) for x, y in pts], close=True,
+                           dxfattribs={"layer": layer, **ext})
+        return len(pts)
+
+    n = poly([(0.0, -hw), (length, -hw), (length, hw), (0.0, hw)], "BLOCK")
     for i, ring in enumerate(rings):
         P = np.asarray(ring)
         if np.allclose(P[0], P[-1]):
             P = P[:-1]
-        msp.add_lwpolyline([(float(x), sy * float(y)) for x, y in P], close=True,
-                           dxfattribs={"layer": "OUTER" if i == 0 else "ISLAND", **ext})
-        n += len(P)
-    msp.add_text(f"{name}  Xia et al. 2025 ATE 258 124611 Fig.3/4  unit mm"
-                 + ("  [Y-up: XZ plane]" if up == "y" else ""),
-                 dxfattribs={"layer": "OUTER", "height": 0.5, **ext}
-                 ).set_placement((0.0, sy * 2.2))
+        n += poly(P, "CHANNEL" if i == 0 else "ISLAND")
+    # 蓋は外形と同じ平板。重ならないよう 0.2 だけ離して置く
+    y0 = hw + 0.2
+    n += poly([(0.0, y0), (length, y0), (length, y0 + w_unit), (0.0, y0 + w_unit)], "LID")
+
+    note = [
+        f"{name}   Xia et al. 2025 ATE 258 124611  Fig.3/Fig.4  unit: mm",
+        f"BLOCK  : extrude {h:g}        (H, full plate height)",
+        f"CHANNEL: cut {h_ch:g} from top (Hch). floor left = {h - h_ch:g}",
+        f"ISLAND : do NOT cut (pillars, full {h_ch:g} tall inside the groove)",
+        f"LID    : extrude {t_lid:g}        (cover plate, optional)",
+        "-> the resulting cross-section matches {tag}_section.dxf (Fig.1c/f)",
+    ]
+    if up == "y":
+        note.append("placed on the XZ plane (Y is vertical, extrude along +Y)")
+    for k, line in enumerate(note):
+        msp.add_text(line, dxfattribs={"layer": "NOTE", "height": 0.28, **ext}
+                     ).set_placement((0.0, sy * (y0 + w_unit + 0.6 + 0.45 * (len(note) - k))))
     doc.saveas(path)
     return n
 
@@ -121,12 +150,12 @@ def inlet_slot(poly, x0, length):
     return float(ys[m].min()), float(ys[m].max())
 
 
-def write_section_dxf(path, name, y_lo, y_hi, w_unit, h, h_ch, t_lid):
+def write_section_dxf(path, name, z_lo, z_hi, w_unit, h, h_ch, t_lid):
     """Fig.1(c)(f) の断面を 1:1 の DXF にする。
 
     図面なので OCS は使わず、素直に XY 平面へ描く。
-    横軸 = 流路幅の方向（0〜W）、縦軸 = 厚み（0〜H、蓋を載せると H + t）。
-    原点は断面の左下（STL の世界座標では z = −W/2, y = 0 にあたる）。
+    横軸 = 流路幅の方向（0〜W。**世界座標の Z = −W/2 が原点**なので
+    `_outline.dxf` や STL と左右が揃う）、縦軸 = 厚み（0〜H、蓋を載せると H + t）。
     """
     import ezdxf
     doc = ezdxf.new("R2010")
@@ -134,7 +163,7 @@ def write_section_dxf(path, name, y_lo, y_hi, w_unit, h, h_ch, t_lid):
     for lay, col in (("SOLID", 5), ("LID", 8), ("DIM", 1), ("TEXT", 7)):
         doc.layers.add(lay, color=col)
     msp = doc.modelspace()
-    u_lo, u_hi = y_lo + 0.5 * w_unit, y_hi + 0.5 * w_unit
+    u_lo, u_hi = z_lo + 0.5 * w_unit, z_hi + 0.5 * w_unit
     z_f = h - h_ch                                    # 流路の底 0.5
 
     # 固体の断面（上面に開いた溝の切り欠きを持つ 1 本の閉じたポリライン）
@@ -335,14 +364,17 @@ def main():
     for name, (poly, info) in four.items():
         tag = TAGS[name]
         rings = M.polygon_rings(M.clean_polygon(poly))
-        n_dxf = write_dxf_ezdxf(os.path.join(OUT, f"{tag}_outline.dxf"), rings, name, a.up)
+        n_dxf = write_dxf_ezdxf(os.path.join(OUT, f"{tag}_outline.dxf"), rings, name,
+                                a.up, X.LY, X.W_UNIT, X.H_SOLID, X.H_CH, a.lid_mm)
         y_lo, y_hi = inlet_slot(poly, 0.0, X.LY)
+        # 断面の横軸は世界座標 Z。Y-up では z = −y なので向きを揃える
+        z_lo, z_hi = (-y_hi, -y_lo) if a.up == "y" else (y_lo, y_hi)
         w_in = write_section_dxf(os.path.join(OUT, f"{tag}_section.dxf"), name,
-                                 y_lo, y_hi, X.W_UNIT, X.H_SOLID, X.H_CH, a.lid_mm)
-        sections.append((name, tag, y_lo, y_hi, w_in))
+                                 z_lo, z_hi, X.W_UNIT, X.H_SOLID, X.H_CH, a.lid_mm)
+        sections.append((name, tag, z_lo, z_hi, w_in))
         rec = dict(name=name, tag=tag, islands=len(poly.interiors), area_mm2=float(poly.area),
                    bounds=[float(v) for v in poly.bounds], dxf_points=n_dxf,
-                   inlet_slot=[y_lo, y_hi], inlet_width=float(w_in),
+                   inlet_slot_z=[float(z_lo), float(z_hi)], inlet_width=float(w_in),
                    **{k: v for k, v in info.items() if k != "name"})
         if not a.no_stl:
             # Reverse は Forward のメッシュを z 軸まわりに 180° 回転する
@@ -423,9 +455,9 @@ def main():
 
     # --- 断面図（Fig.1 c/f と見比べる用） ---
     fig, axes = plt.subplots(1, 4, figsize=(15, 4.2))
-    for ax, (name, tag, y_lo, y_hi, w_in) in zip(axes, sections):
+    for ax, (name, tag, z_lo, z_hi, w_in) in zip(axes, sections):
         W, H, Hc, t = X.W_UNIT, X.H_SOLID, X.H_CH, a.lid_mm
-        u_lo, u_hi, z_f = y_lo + 0.5 * W, y_hi + 0.5 * W, H - Hc
+        u_lo, u_hi, z_f = z_lo + 0.5 * W, z_hi + 0.5 * W, H - Hc
         ax.add_patch(plt.Rectangle((0, 0), W, H, fc="#f0a882", ec="k", lw=0.8))
         ax.add_patch(plt.Rectangle((u_lo, z_f), u_hi - u_lo, Hc,
                                    fc="#bfe9f5", ec="k", lw=0.8))
