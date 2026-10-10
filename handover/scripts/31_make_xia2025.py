@@ -114,6 +114,83 @@ def _end_face(x0, y_lo, y_hi, z_floor, z_top, h_half, outward_x):
     return out
 
 
+def _end_face_hole(x0, y_lo, y_hi, z_floor, z_top, h_half, z_lid, outward_x):
+    """端面（x = x0）。蓋を載せた版。流路の開口は面の**内側の穴**になる。
+
+    蓋が無い版（`_end_face`）では開口が上端まで抜けるので外形の切り欠きになるが、
+    蓋を載せると周囲が固体で囲まれるため穴として扱う。
+    """
+    shell = [(-h_half, 0.0), (h_half, 0.0), (h_half, z_lid), (-h_half, z_lid)]
+    hole = [(y_lo, z_floor), (y_hi, z_floor), (y_hi, z_top), (y_lo, z_top)]
+    prof = Polygon(shell, [hole])
+    out = []
+    for t in M.triangulate_polygon(prof):
+        v = [(x0, float(q[0]), float(q[1])) for q in t]
+        a, b, c = (np.array(u) for u in v)
+        n = np.cross(b - a, c - a)
+        if (n[0] > 0) != (outward_x > 0):
+            v = v[::-1]
+        out.append(v)
+    return out
+
+
+def lid_solid(length, h_half, z0, t):
+    """蓋（平板）。z0..z0+t の直方体。流路を塞ぐカバー。"""
+    return _box(0.0, length, -h_half, h_half, z0, z0 + t)
+
+
+def _box(x0, x1, y0, y1, z0, z1):
+    """軸に沿った直方体（法線は外向き）。"""
+    P = [(x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
+         (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1)]
+    quads = [(0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4),
+             (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    out = []
+    for a, b, c, d in quads:
+        out += [[P[a], P[b], P[c]], [P[a], P[c], P[d]]]
+    return out
+
+
+def capped_solid(poly, z_floor, z_top, h_half, length, cuts, t_lid):
+    """蓋を一体にした固体。流路は内部の空洞になり、端面にだけ開口する。
+
+    `block_solid` との違いは 3 点。
+      - 上面が z_top + t_lid の**全面**（流路の外だけ、ではない）
+      - 流路の天井（z_top の上に蓋が載る面、法線は下向き）を足す
+      - 端面の開口が外形の切り欠きではなく**穴**になる
+    """
+    poly = M.clean_polygon(poly)
+    z_lid = z_top + t_lid
+    rect = box(0.0, -h_half, length, h_half)
+    faces = S3.caps_cut(rect, 0.0, False, cuts)        # 底面
+    faces += S3.caps_cut(rect, z_lid, True, cuts)      # 蓋の上面
+    faces += S3.caps_cut(poly, z_floor, True, cuts)    # 流路の底
+    faces += S3.caps_cut(poly, z_top, False, cuts)     # 流路の天井（蓋の裏）
+    for g in S3._pieces(poly, cuts):                   # 溝の壁
+        rings = [S3.closed(g.exterior, True)] + [S3.closed(r, False) for r in g.interiors]
+        for P in rings:
+            for a, b in zip(P[:-1], P[1:]):
+                if S3._on_cut(a, b, cuts) or S3._on_cut(a, b, [0.0, length]):
+                    continue
+                q = [(a[0], a[1], z_floor), (b[0], b[1], z_floor),
+                     (b[0], b[1], z_top), (a[0], a[1], z_top)]
+                faces += [[q[0], q[2], q[1]], [q[0], q[3], q[2]]]
+    xs = [0.0] + sorted(cuts) + [length]               # 外周 y = ±h
+    for xa, xb in zip(xs[:-1], xs[1:]):
+        for y in (-h_half, h_half):
+            q = [(xa, y, 0.0), (xb, y, 0.0), (xb, y, z_lid), (xa, y, z_lid)]
+            tq = [[q[0], q[1], q[2]], [q[0], q[2], q[3]]]
+            faces += [u[::-1] for u in tq] if y > 0 else tq
+    xs_, ys_ = np.asarray(poly.exterior.coords).T      # 端面（開口は穴）
+    m0 = np.abs(xs_) < 1e-9
+    m1 = np.abs(xs_ - length) < 1e-9
+    faces += _end_face_hole(0.0, ys_[m0].min(), ys_[m0].max(), z_floor, z_top,
+                            h_half, z_lid, -1)
+    faces += _end_face_hole(length, ys_[m1].min(), ys_[m1].max(), z_floor, z_top,
+                            h_half, z_lid, +1)
+    return faces
+
+
 def block_solid(poly, z_floor, z_top, h_half, length, cuts):
     """流路を彫ったブロック。入口・出口は端面に開口する。
 
@@ -172,6 +249,8 @@ def draw(ax, poly, title):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-stl", action="store_true")
+    ap.add_argument("--lid-mm", type=float, default=1.0,
+                    help="蓋（カバー板）の厚み [mm]。既定 1.0")
     ap.add_argument("--up", choices=["y", "z"], default="y",
                     help="鉛直にする軸。既定 y（板は XZ 平面に寝る）")
     a = ap.parse_args()
@@ -203,37 +282,57 @@ def main():
             # （(x, y) → (Ly − x, −y)）。回転は面の向きを保つので頂点順はそのまま。
             if name.endswith("Reverse"):
                 fwd = meshes[name.replace("Reverse", "Forward")]
-                ff = [[(X.LY - p[0], -p[1], p[2]) for p in t] for t in fwd[0]]
-                bf = [[(X.LY - p[0], -p[1], p[2]) for p in t] for t in fwd[1]]
+                rot = lambda F: [[(X.LY - q[0], -q[1], q[2]) for q in t] for t in F]
+                ff, bf, cf = (rot(fwd[0]), rot(fwd[1]), rot(fwd[2]))
             else:
                 # 段ごとに x = 一定で切る（島の無い接続部）。穴の少ない小片にして
                 # 三角形分割を安定させ、蓋と側壁の頂点を一致させる
                 cuts = [X.X_C1 + X.PITCH * k + 3.0 for k in range(X.N_STAGE - 1)]
                 ff = S3.fluid_solid_cut(poly, z_floor, z_top, cuts)
                 bf = block_solid(poly, z_floor, z_top, h_half, X.LY, cuts)
-            meshes[name] = (ff, bf)          # 以降の Reverse 生成は Z 厚みのまま使う
+                cf = capped_solid(poly, z_floor, z_top, h_half, X.LY, cuts, a.lid_mm)
+            meshes[name] = (ff, bf, cf)      # 以降の Reverse 生成は Z 厚みのまま使う
             bad_f, _ = M.check_manifold(ff)
             bad_b, _ = M.check_manifold(bf)
+            bad_c, _ = M.check_manifold(cf)
             vol_f = M.mesh_volume(ff)
             vol_b = M.mesh_volume(bf)
+            vol_c = M.mesh_volume(cf)
             # 書き出す直前に Y-up へ回す（検査は回転不変なので順序はどちらでもよい）
-            ff_w, bf_w = (to_yup(ff), to_yup(bf)) if a.up == "y" else (ff, bf)
+            tr = to_yup if a.up == "y" else (lambda F: F)
+            ff_w, bf_w, cf_w = tr(ff), tr(bf), tr(cf)
             nf = M.write_stl(os.path.join(OUT, f"{tag}_fluid.stl"), ff_w)
             nb = M.write_stl(os.path.join(OUT, f"{tag}_block.stl"), bf_w)
+            nc = M.write_stl(os.path.join(OUT, f"{tag}_capped.stl"), cf_w)
             vol_expect = X.LY * X.W_UNIT * X.H_SOLID - vol_f
             rec.update(fluid_triangles=nf, fluid_volume_mm3=float(vol_f),
                        block_triangles=nb, block_volume_mm3=float(vol_b),
                        block_volume_expected=float(vol_expect),
-                       up_axis=a.up,
+                       capped_triangles=nc, capped_volume_mm3=float(vol_c),
+                       capped_volume_expected=float(vol_expect + X.LY * X.W_UNIT * a.lid_mm),
+                       lid_mm=a.lid_mm, up_axis=a.up,
                        stl_bounds=[float(v) for v in
                                    np.asarray(ff_w).reshape(-1, 3).min(0)]
                                   + [float(v) for v in
                                      np.asarray(ff_w).reshape(-1, 3).max(0)],
-                       watertight=bool(bad_f == 0 and bad_b == 0))
-            print(f"  {name:16s} 島 {len(poly.interiors):2d}  流体 {nf:6d} 三角形 {vol_f:7.2f} mm^3  "
-                  f"ブロック {nb:6d} 三角形 {vol_b:7.2f} mm^3（期待 {vol_expect:.2f}）  "
-                  f"{'OK' if rec['watertight'] else f'**非多様体 {bad_f}/{bad_b}**'}")
+                       watertight=bool(bad_f == 0 and bad_b == 0 and bad_c == 0))
+            vc_exp = vol_expect + X.LY * X.W_UNIT * a.lid_mm
+            print(f"  {name:16s} 島 {len(poly.interiors):2d}  "
+                  f"流体 {nf:6d}面 {vol_f:7.2f}  "
+                  f"ブロック {nb:6d}面 {vol_b:7.2f}（期待 {vol_expect:.2f}）  "
+                  f"蓋付き {nc:6d}面 {vol_c:7.2f}（期待 {vc_exp:.2f}）  "
+                  f"{'OK' if rec['watertight'] else f'**非多様体 {bad_f}/{bad_b}/{bad_c}**'}")
         recs.append(rec)
+
+    if not a.no_stl:
+        lf = lid_solid(X.LY, h_half, z_top, a.lid_mm)
+        bad_l, _ = M.check_manifold(lf)
+        lf_w = to_yup(lf) if a.up == "y" else lf
+        nl = M.write_stl(os.path.join(OUT, "xia2025_lid.stl"), lf_w)
+        print(f"  {'蓋（4 構成で共通）':16s} {nl:6d}面 "
+              f"{M.mesh_volume(lf):7.2f} mm^3  "
+              f"{X.LY} x {X.W_UNIT} x {a.lid_mm} mm  "
+              f"{'OK' if bad_l == 0 else f'**非多様体 {bad_l}**'}")
 
     j = os.path.join(HERE, "..", "results", "cad", "cad_xia2025.json")
     os.makedirs(os.path.dirname(j), exist_ok=True)
@@ -241,7 +340,7 @@ def main():
                    params=dict(w_ch=X.W_CH, R_in=X.R_IN, R_out=X.R_OUT, tip_deg=X.TIP_DEG,
                                pitch=X.PITCH, x_c1=X.X_C1, cy=float(X.CY), band_deg=X.ANG,
                                Ly=X.LY, W=X.W_UNIT, H_ch=X.H_CH, H=X.H_SOLID, n_stage=X.N_STAGE,
-                               up_axis=a.up),
+                               lid_mm=a.lid_mm, up_axis=a.up),
                    models=recs), open(j, "w"), indent=1, ensure_ascii=False)
     print(f"saved {os.path.normpath(j)}")
 

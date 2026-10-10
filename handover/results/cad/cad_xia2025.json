@@ -14,6 +14,7 @@
   "H_ch": 1.5,
   "H": 2.0,
   "n_stage": 10,
+  "lid_mm": 1.0,
   "up_axis": "y"
  },
  "models": [
@@ -89,6 +90,10 @@
    "block_triangles": 10544,
    "block_volume_mm3": 275.7975095087283,
    "block_volume_expected": 275.79750950872824,
+   "capped_triangles": 10668,
+   "capped_volume_mm3": 452.7975095087281,
+   "capped_volume_expected": 452.79750950872824,
+   "lid_mm": 1.0,
    "up_axis": "y",
    "stl_bounds": [
     0.0,
@@ -172,6 +177,10 @@
    "block_triangles": 10544,
    "block_volume_mm3": 275.79750950872835,
    "block_volume_expected": 275.7975095087283,
+   "capped_triangles": 10668,
+   "capped_volume_mm3": 452.7975095087283,
+   "capped_volume_expected": 452.7975095087283,
+   "lid_mm": 1.0,
    "up_axis": "y",
    "stl_bounds": [
     0.0,
@@ -253,6 +262,10 @@
    "block_triangles": 7728,
    "block_volume_mm3": 309.81976539743454,
    "block_volume_expected": 309.8197653974345,
+   "capped_triangles": 7772,
+   "capped_volume_mm3": 486.81976539743437,
+   "capped_volume_expected": 486.8197653974345,
+   "lid_mm": 1.0,
    "up_axis": "y",
    "stl_bounds": [
     0.0,
@@ -334,6 +347,10 @@
    "block_triangles": 7728,
    "block_volume_mm3": 309.81976539743454,
    "block_volume_expected": 309.8197653974344,
+   "capped_triangles": 7772,
+   "capped_volume_mm3": 486.81976539743454,
+   "capped_volume_expected": 486.8197653974344,
+   "lid_mm": 1.0,
    "up_axis": "y",
    "stl_bounds": [
     0.0,
