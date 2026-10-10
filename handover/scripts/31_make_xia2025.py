@@ -16,6 +16,21 @@ Reverse は Forward の 180° 回転（同じ流路を逆向きに流し、入�
 | `{名前}_block.stl` | 計算単位のブロック 50 × 3.54 × 2.0 に流路を深さ 1.5 で彫ったもの。入口・出口は端面に開口 |
 | `{名前}_outline.dxf` | 流路の 2D 輪郭（Fusion で「挿入 > DXF を挿入」→ 押し出し 1.5 mm） |
 
+座標の約束（**2026-10-10 変更**）
+-----------------------------------
+
+既定は **Y 軸が鉛直（Y-up）**。板は XZ 平面に寝て、厚み方向が +Y になる。
+`--up z` を付けると従来どおり Z 厚み（板が XY 平面）で出る。
+
+    Y-up への変換は X 軸まわり −90 度の回転   (x, y, z) -> (x, z, -y)
+
+回転なので三角形の向き（法線）は保たれる。流路の進行方向は +X、
+流路幅の方向は Z、彫り込みの深さは −Y（板の上面が y = 2.0、流路の底が y = 0.5）。
+
+DXF も同じ平面に載せる。LWPOLYLINE を押し出し方向 (0, -1, 0) の OCS で書くので、
+CAD 上では XZ 平面（地面）に乗る。**押し出し方向を読まない簡易ビューアでは
+y が反転した 2 次元図形に見える**（形は正しい）。
+
 全モデルで「各辺がちょうど 2 枚の三角形に共有される」ことを確認する。
 STEP は出せない（cadquery が Python 3.14 に未対応）。Fusion で面付きソリッドが
 要るときは DXF を押し出す方が速い。
@@ -35,17 +50,30 @@ import mesh as M
 import solid3d as S3
 import plotstyle
 
+def to_yup(faces):
+    """Z 厚みの三角形列を Y-up へ回す。X 軸まわり −90 度: (x, y, z) -> (x, z, −y)。
+
+    回転（行列式 +1）なので頂点順＝法線の向きはそのまま使える。
+    """
+    return [[(p[0], p[2], -p[1]) for p in t] for t in faces]
+
+
 OUT = os.path.join(HERE, "..", "cad", "xia2025")
+UP = "y"                               # main() が --up で上書きする（render3d 用）
 FIG = os.path.join(HERE, "..", "figures", "geometry")
 TAGS = {"SYMTVM-Forward": "xia2025_symtvm_fwd", "SYMTVM-Reverse": "xia2025_symtvm_rev",
         "TVM-Forward": "xia2025_tvm_fwd", "TVM-Reverse": "xia2025_tvm_rev"}
 
 
-def write_dxf_ezdxf(path, rings, name):
+def write_dxf_ezdxf(path, rings, name, up="y"):
     """閉じた LWPOLYLINE の DXF（R2010、単位 mm）。Fusion 360 の「DXF を挿入」用。
 
     `mesh.write_dxf` の最小実装は閉じフラグが読まれない環境があるので、ここでは ezdxf で書く。
     外形はレイヤ OUTER、島は ISLAND。
+
+    up="y" のときは押し出し方向を (0, −1, 0) にして **XZ 平面（地面）** に載せる。
+    DXF の任意軸アルゴリズムにより OCS の (u, v) が世界座標 (u, 0, v) に対応するので、
+    v = −y と書けば STL（`to_yup`）と同じ位置・同じ向きになる。
     """
     import ezdxf
     doc = ezdxf.new("R2010")
@@ -53,16 +81,20 @@ def write_dxf_ezdxf(path, rings, name):
     doc.layers.add("OUTER", color=5)
     doc.layers.add("ISLAND", color=1)
     msp = doc.modelspace()
+    sy = -1.0 if up == "y" else 1.0           # OCS 上の v = −y（up="y" のとき）
+    ext = {"extrusion": (0.0, -1.0, 0.0)} if up == "y" else {}
     n = 0
     for i, ring in enumerate(rings):
         P = np.asarray(ring)
         if np.allclose(P[0], P[-1]):
             P = P[:-1]
-        msp.add_lwpolyline([(float(x), float(y)) for x, y in P], close=True,
-                           dxfattribs={"layer": "OUTER" if i == 0 else "ISLAND"})
+        msp.add_lwpolyline([(float(x), sy * float(y)) for x, y in P], close=True,
+                           dxfattribs={"layer": "OUTER" if i == 0 else "ISLAND", **ext})
         n += len(P)
-    msp.add_text(f"{name}  Xia et al. 2025 ATE 258 124611 Fig.3/4  unit mm",
-                 dxfattribs={"layer": "OUTER", "height": 0.5}).set_placement((0, 2.2))
+    msp.add_text(f"{name}  Xia et al. 2025 ATE 258 124611 Fig.3/4  unit mm"
+                 + ("  [Y-up: XZ plane]" if up == "y" else ""),
+                 dxfattribs={"layer": "OUTER", "height": 0.5, **ext}
+                 ).set_placement((0.0, sy * 2.2))
     doc.saveas(path)
     return n
 
@@ -140,7 +172,11 @@ def draw(ax, poly, title):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-stl", action="store_true")
+    ap.add_argument("--up", choices=["y", "z"], default="y",
+                    help="鉛直にする軸。既定 y（板は XZ 平面に寝る）")
     a = ap.parse_args()
+    global UP
+    UP = a.up
     os.makedirs(OUT, exist_ok=True)
     os.makedirs(FIG, exist_ok=True)
     plotstyle.use_jp()
@@ -158,7 +194,7 @@ def main():
     for name, (poly, info) in four.items():
         tag = TAGS[name]
         rings = M.polygon_rings(M.clean_polygon(poly))
-        n_dxf = write_dxf_ezdxf(os.path.join(OUT, f"{tag}_outline.dxf"), rings, name)
+        n_dxf = write_dxf_ezdxf(os.path.join(OUT, f"{tag}_outline.dxf"), rings, name, a.up)
         rec = dict(name=name, tag=tag, islands=len(poly.interiors), area_mm2=float(poly.area),
                    bounds=[float(v) for v in poly.bounds], dxf_points=n_dxf,
                    **{k: v for k, v in info.items() if k != "name"})
@@ -175,17 +211,24 @@ def main():
                 cuts = [X.X_C1 + X.PITCH * k + 3.0 for k in range(X.N_STAGE - 1)]
                 ff = S3.fluid_solid_cut(poly, z_floor, z_top, cuts)
                 bf = block_solid(poly, z_floor, z_top, h_half, X.LY, cuts)
-            meshes[name] = (ff, bf)
+            meshes[name] = (ff, bf)          # 以降の Reverse 生成は Z 厚みのまま使う
             bad_f, _ = M.check_manifold(ff)
-            nf = M.write_stl(os.path.join(OUT, f"{tag}_fluid.stl"), ff)
-            vol_f = M.mesh_volume(ff)
             bad_b, _ = M.check_manifold(bf)
-            nb = M.write_stl(os.path.join(OUT, f"{tag}_block.stl"), bf)
+            vol_f = M.mesh_volume(ff)
             vol_b = M.mesh_volume(bf)
+            # 書き出す直前に Y-up へ回す（検査は回転不変なので順序はどちらでもよい）
+            ff_w, bf_w = (to_yup(ff), to_yup(bf)) if a.up == "y" else (ff, bf)
+            nf = M.write_stl(os.path.join(OUT, f"{tag}_fluid.stl"), ff_w)
+            nb = M.write_stl(os.path.join(OUT, f"{tag}_block.stl"), bf_w)
             vol_expect = X.LY * X.W_UNIT * X.H_SOLID - vol_f
             rec.update(fluid_triangles=nf, fluid_volume_mm3=float(vol_f),
                        block_triangles=nb, block_volume_mm3=float(vol_b),
                        block_volume_expected=float(vol_expect),
+                       up_axis=a.up,
+                       stl_bounds=[float(v) for v in
+                                   np.asarray(ff_w).reshape(-1, 3).min(0)]
+                                  + [float(v) for v in
+                                     np.asarray(ff_w).reshape(-1, 3).max(0)],
                        watertight=bool(bad_f == 0 and bad_b == 0))
             print(f"  {name:16s} 島 {len(poly.interiors):2d}  流体 {nf:6d} 三角形 {vol_f:7.2f} mm^3  "
                   f"ブロック {nb:6d} 三角形 {vol_b:7.2f} mm^3（期待 {vol_expect:.2f}）  "
@@ -197,7 +240,8 @@ def main():
     json.dump(dict(source="Xia et al., Appl. Therm. Eng. 258 (2025) 124611, Fig.3/Fig.4/Table 2",
                    params=dict(w_ch=X.W_CH, R_in=X.R_IN, R_out=X.R_OUT, tip_deg=X.TIP_DEG,
                                pitch=X.PITCH, x_c1=X.X_C1, cy=float(X.CY), band_deg=X.ANG,
-                               Ly=X.LY, W=X.W_UNIT, H_ch=X.H_CH, H=X.H_SOLID, n_stage=X.N_STAGE),
+                               Ly=X.LY, W=X.W_UNIT, H_ch=X.H_CH, H=X.H_SOLID, n_stage=X.N_STAGE,
+                               up_axis=a.up),
                    models=recs), open(j, "w"), indent=1, ensure_ascii=False)
     print(f"saved {os.path.normpath(j)}")
 
@@ -251,6 +295,8 @@ def render3d():
     for i, (name, tag) in enumerate(TAGS.items()):
         for j, (role, col, zs) in enumerate((("block", "#c9c2b4", 3.0), ("fluid", "#5fa8a6", 3.0))):
             tri = _read_faces(os.path.join(OUT, f"{tag}_{role}.stl"))
+            if UP == "y":           # 描画用に Z-up へ戻す（matplotlib の 3D は Z 上）
+                tri = np.stack([tri[:, :, 0], -tri[:, :, 2], tri[:, :, 1]], axis=-1)
             ax = fig.add_subplot(len(TAGS), 2, 2 * i + j + 1, projection="3d")
             n = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
             n /= np.linalg.norm(n, axis=1, keepdims=True) + 1e-15

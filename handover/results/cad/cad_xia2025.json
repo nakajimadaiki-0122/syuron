@@ -13,14 +13,15 @@
   "W": 3.54,
   "H_ch": 1.5,
   "H": 2.0,
-  "n_stage": 10
+  "n_stage": 10,
+  "up_axis": "y"
  },
  "models": [
   {
    "name": "SYMTVM-Forward",
    "tag": "xia2025_symtvm_fwd",
    "islands": 30,
-   "area_mm2": 52.13461126411641,
+   "area_mm2": 52.1346112641164,
    "bounds": [
     0.0,
     -1.5122528308469982,
@@ -80,21 +81,30 @@
     -0.31,
     0.31
    ],
-   "diamond_side": 1.843251785767802,
+   "diamond_side": 1.8432517857678024,
    "chord_off": -0.3836339401043656,
    "wall_len_first": 3.748187934001751,
    "fluid_triangles": 10576,
-   "fluid_volume_mm3": 78.20249049127177,
+   "fluid_volume_mm3": 78.20249049127175,
    "block_triangles": 10544,
-   "block_volume_mm3": 275.7975095087282,
+   "block_volume_mm3": 275.7975095087283,
    "block_volume_expected": 275.79750950872824,
+   "up_axis": "y",
+   "stl_bounds": [
+    0.0,
+    0.5,
+    -1.5122528308469982,
+    50.0,
+    2.0,
+    1.5122528308469982
+   ],
    "watertight": true
   },
   {
    "name": "SYMTVM-Reverse",
    "tag": "xia2025_symtvm_rev",
    "islands": 30,
-   "area_mm2": 52.13461126411638,
+   "area_mm2": 52.13461126411637,
    "bounds": [
     0.0,
     -1.5122528308469982,
@@ -154,21 +164,30 @@
     -0.31,
     0.31
    ],
-   "diamond_side": 1.843251785767802,
+   "diamond_side": 1.8432517857678024,
    "chord_off": -0.3836339401043656,
    "wall_len_first": 3.748187934001751,
    "fluid_triangles": 10576,
-   "fluid_volume_mm3": 78.2024904912717,
+   "fluid_volume_mm3": 78.20249049127169,
    "block_triangles": 10544,
    "block_volume_mm3": 275.79750950872835,
    "block_volume_expected": 275.7975095087283,
+   "up_axis": "y",
+   "stl_bounds": [
+    0.0,
+    0.5,
+    -1.5122528308469982,
+    50.0,
+    2.0,
+    1.5122528308469982
+   ],
    "watertight": true
   },
   {
    "name": "TVM-Forward",
    "tag": "xia2025_tvm_fwd",
    "islands": 10,
-   "area_mm2": 29.45157775138636,
+   "area_mm2": 29.45157775138638,
    "bounds": [
     0.0,
     -1.5122533745182096,
@@ -232,15 +251,24 @@
    "fluid_triangles": 7680,
    "fluid_volume_mm3": 44.18023460256552,
    "block_triangles": 7728,
-   "block_volume_mm3": 309.8197653974345,
+   "block_volume_mm3": 309.81976539743454,
    "block_volume_expected": 309.8197653974345,
+   "up_axis": "y",
+   "stl_bounds": [
+    0.0,
+    0.5,
+    -1.5122533745182096,
+    50.0,
+    2.0,
+    1.5122533745182096
+   ],
    "watertight": true
   },
   {
    "name": "TVM-Reverse",
    "tag": "xia2025_tvm_rev",
    "islands": 10,
-   "area_mm2": 29.451577751386374,
+   "area_mm2": 29.451577751386367,
    "bounds": [
     0.0,
     -1.5122533745182096,
@@ -302,10 +330,19 @@
    ],
    "w_in": 0.3105828541230249,
    "fluid_triangles": 7680,
-   "fluid_volume_mm3": 44.180234602565555,
+   "fluid_volume_mm3": 44.18023460256558,
    "block_triangles": 7728,
-   "block_volume_mm3": 309.8197653974344,
+   "block_volume_mm3": 309.81976539743454,
    "block_volume_expected": 309.8197653974344,
+   "up_axis": "y",
+   "stl_bounds": [
+    0.0,
+    0.5,
+    -1.5122533745182096,
+    50.0,
+    2.0,
+    1.5122533745182096
+   ],
    "watertight": true
   }
  ]
