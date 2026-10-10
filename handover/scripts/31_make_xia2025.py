@@ -114,6 +114,67 @@ def _end_face(x0, y_lo, y_hi, z_floor, z_top, h_half, outward_x):
     return out
 
 
+def inlet_slot(poly, x0, length):
+    """x = x0 の端面で流路が開いている y の範囲（= 断面のスロット位置）。"""
+    xs, ys = np.asarray(poly.exterior.coords).T
+    m = np.abs(xs - x0) < 1e-9
+    return float(ys[m].min()), float(ys[m].max())
+
+
+def write_section_dxf(path, name, y_lo, y_hi, w_unit, h, h_ch, t_lid):
+    """Fig.1(c)(f) の断面を 1:1 の DXF にする。
+
+    図面なので OCS は使わず、素直に XY 平面へ描く。
+    横軸 = 流路幅の方向（0〜W）、縦軸 = 厚み（0〜H、蓋を載せると H + t）。
+    原点は断面の左下（STL の世界座標では z = −W/2, y = 0 にあたる）。
+    """
+    import ezdxf
+    doc = ezdxf.new("R2010")
+    doc.header["$INSUNITS"] = 4
+    for lay, col in (("SOLID", 5), ("LID", 8), ("DIM", 1), ("TEXT", 7)):
+        doc.layers.add(lay, color=col)
+    msp = doc.modelspace()
+    u_lo, u_hi = y_lo + 0.5 * w_unit, y_hi + 0.5 * w_unit
+    z_f = h - h_ch                                    # 流路の底 0.5
+
+    # 固体の断面（上面に開いた溝の切り欠きを持つ 1 本の閉じたポリライン）
+    prof = [(0.0, 0.0), (w_unit, 0.0), (w_unit, h), (u_hi, h),
+            (u_hi, z_f), (u_lo, z_f), (u_lo, h), (0.0, h)]
+    msp.add_lwpolyline(prof, close=True, dxfattribs={"layer": "SOLID"})
+    # 蓋（別レイヤ。要らなければ消せる）
+    msp.add_lwpolyline([(0.0, h), (w_unit, h), (w_unit, h + t_lid), (0.0, h + t_lid)],
+                       close=True, dxfattribs={"layer": "LID"})
+
+    def dim(p0, p1, label, off, vertical=False):
+        """寸法線（端末記号なしの素直な線）と文字。"""
+        a = np.array(p0, float); b = np.array(p1, float)
+        d = np.array([off, 0.0]) if vertical else np.array([0.0, off])
+        msp.add_line(tuple(a), tuple(a + d), dxfattribs={"layer": "DIM"})
+        msp.add_line(tuple(b), tuple(b + d), dxfattribs={"layer": "DIM"})
+        msp.add_line(tuple(a + d), tuple(b + d), dxfattribs={"layer": "DIM"})
+        m = 0.5 * (a + b) + d
+        t = msp.add_text(label, dxfattribs={"layer": "TEXT", "height": 0.11,
+                                            "rotation": 90 if vertical else 0})
+        t.set_placement((m[0] + (0.06 if vertical else 0.0),
+                         m[1] + (0.0 if vertical else 0.06)))
+
+    dim((0.0, 0.0), (w_unit, 0.0), f"W={w_unit}", -0.45)
+    dim((u_lo, z_f), (u_hi, z_f), f"Wch={u_hi - u_lo:.2f}", -0.22)
+    dim((w_unit, 0.0), (w_unit, h), f"H={h:g}", 0.60, vertical=True)
+    dim((u_hi, z_f), (u_hi, h), f"Hch={h_ch:g}", 0.26, vertical=True)
+    dim((0.0, h), (0.0, h + t_lid), f"lid t={t_lid:g}", -0.30, vertical=True)
+
+    msp.add_text(f"{name}  cross-section at inlet (x=0)  —  Xia et al. 2025 "
+                 f"ATE 258 124611 Fig.1(c)(f)  unit mm  1:1",
+                 dxfattribs={"layer": "TEXT", "height": 0.13}
+                 ).set_placement((0.0, h + t_lid + 0.35))
+    msp.add_text("solid = layer SOLID, cover plate = layer LID",
+                 dxfattribs={"layer": "TEXT", "height": 0.1}
+                 ).set_placement((0.0, h + t_lid + 0.17))
+    doc.saveas(path)
+    return u_hi - u_lo
+
+
 def _end_face_hole(x0, y_lo, y_hi, z_floor, z_top, h_half, z_lid, outward_x):
     """端面（x = x0）。蓋を載せた版。流路の開口は面の**内側の穴**になる。
 
@@ -266,6 +327,7 @@ def main():
     four = X.all_four()
     recs = []
     meshes = {}
+    sections = []
     print("=" * 96)
     print(f" Xia et al. (2025) Fig.3 の 4 構成   流路幅 {X.W_CH}, R_in {X.R_IN}, R_out {X.R_OUT}, "
           f"ピッチ {X.PITCH}, cy = {X.CY:.3f}, Ly {X.LY}, W {X.W_UNIT}, Hch {X.H_CH}, H {X.H_SOLID}")
@@ -274,8 +336,13 @@ def main():
         tag = TAGS[name]
         rings = M.polygon_rings(M.clean_polygon(poly))
         n_dxf = write_dxf_ezdxf(os.path.join(OUT, f"{tag}_outline.dxf"), rings, name, a.up)
+        y_lo, y_hi = inlet_slot(poly, 0.0, X.LY)
+        w_in = write_section_dxf(os.path.join(OUT, f"{tag}_section.dxf"), name,
+                                 y_lo, y_hi, X.W_UNIT, X.H_SOLID, X.H_CH, a.lid_mm)
+        sections.append((name, tag, y_lo, y_hi, w_in))
         rec = dict(name=name, tag=tag, islands=len(poly.interiors), area_mm2=float(poly.area),
                    bounds=[float(v) for v in poly.bounds], dxf_points=n_dxf,
+                   inlet_slot=[y_lo, y_hi], inlet_width=float(w_in),
                    **{k: v for k, v in info.items() if k != "name"})
         if not a.no_stl:
             # Reverse は Forward のメッシュを z 軸まわりに 180° 回転する
@@ -352,6 +419,36 @@ def main():
     fig.tight_layout()
     png = os.path.join(FIG, "xia2025_four.png")
     fig.savefig(png, dpi=130)
+    print(f"saved {os.path.normpath(png)}")
+
+    # --- 断面図（Fig.1 c/f と見比べる用） ---
+    fig, axes = plt.subplots(1, 4, figsize=(15, 4.2))
+    for ax, (name, tag, y_lo, y_hi, w_in) in zip(axes, sections):
+        W, H, Hc, t = X.W_UNIT, X.H_SOLID, X.H_CH, a.lid_mm
+        u_lo, u_hi, z_f = y_lo + 0.5 * W, y_hi + 0.5 * W, H - Hc
+        ax.add_patch(plt.Rectangle((0, 0), W, H, fc="#f0a882", ec="k", lw=0.8))
+        ax.add_patch(plt.Rectangle((u_lo, z_f), u_hi - u_lo, Hc,
+                                   fc="#bfe9f5", ec="k", lw=0.8))
+        ax.add_patch(plt.Rectangle((0, H), W, t, fc="#dedede", ec="k",
+                                   lw=0.8, ls="--"))
+        ax.annotate("", (0, -0.55), (W, -0.55), arrowprops=dict(arrowstyle="<->", lw=0.8))
+        ax.text(0.5 * W, -0.75, f"W={W}", ha="center", fontsize=8)
+        ax.annotate("", (u_lo, -0.12), (u_hi, -0.12), arrowprops=dict(arrowstyle="<->", lw=0.8))
+        ax.text(0.5 * (u_lo + u_hi), -0.26, f"Wch={w_in:.2f}", ha="center", fontsize=8)
+        ax.annotate("", (W + 0.3, 0), (W + 0.3, H), arrowprops=dict(arrowstyle="<->", lw=0.8))
+        ax.text(W + 0.38, 0.5 * H, f"H={H:g}", rotation=90, va="center", fontsize=8)
+        ax.annotate("", (u_hi + 0.15, z_f), (u_hi + 0.15, H),
+                    arrowprops=dict(arrowstyle="<->", lw=0.8))
+        ax.text(u_hi + 0.22, z_f + 0.5 * Hc, f"Hch={Hc:g}", rotation=90, va="center", fontsize=8)
+        ax.text(0.5 * W, H + 0.5 * t, f"蓋 t={t:g}", ha="center", va="center", fontsize=7)
+        ax.set_xlim(-0.6, W + 0.9); ax.set_ylim(-1.0, H + t + 0.3)
+        ax.set_aspect("equal"); ax.axis("off")
+        ax.set_title(f"{name} 入口断面（x = 0）", fontsize=9)
+    fig.suptitle("Xia et al. (2025) Fig.1(c)(f) に対応する入口断面（単位 mm、1:1）",
+                 fontsize=11)
+    fig.tight_layout()
+    png = os.path.join(FIG, "xia2025_section.png")
+    fig.savefig(png, dpi=140)
     print(f"saved {os.path.normpath(png)}")
 
     fig, axes = plt.subplots(2, 1, figsize=(14, 8))
