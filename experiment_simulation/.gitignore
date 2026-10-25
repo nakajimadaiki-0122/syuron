@@ -1,0 +1,12 @@
+# Fluent の大きなバイナリ（メッシュ・ケース・データ）。数十 MB ずつあるので Git に入れない
+*.h5
+*.msh
+*.cas
+*.dat
+# Fluent の作業ファイル
+*.trn
+cleanup-fluent-*.bat
+*_workflow_files/
+FM_*/
+# Python
+__pycache__/
