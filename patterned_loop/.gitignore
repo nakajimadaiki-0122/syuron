@@ -1,0 +1,10 @@
+# Fluent の大きなバイナリと作業ファイル
+*.h5
+*.msh
+*.cas
+*.dat
+*.trn
+cleanup-fluent-*.bat
+*_workflow_files/
+FM_*/
+__pycache__/

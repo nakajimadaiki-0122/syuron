@@ -1,0 +1,44 @@
+{
+ "mode": "bump",
+ "radius_mm": 0.1,
+ "spacing_mm": 0.4,
+ "rows_z_mm": [
+  0.85,
+  1.25,
+  1.65
+ ],
+ "hemispheres_total": 1026,
+ "fluid_volume_base_mm3": 78.2019168961746,
+ "fluid_volume_expected_mm3": 76.05306752111917,
+ "min_copper_thickness_behind_dimple_mm": null,
+ "models": {
+  "symtvm_fwd": {
+   "nonmanifold_fluid": 0,
+   "nonmanifold_solid": 0,
+   "fluid_volume_mm3": 76.18500008741411,
+   "solid_volume_mm3": 277.81499991258585,
+   "total_volume_mm3": 353.99999999999994,
+   "hemisphere_triangles": 123120,
+   "zone_files": 11,
+   "triangles": 365448,
+   "edge_use": {
+    "2": 535764,
+    "3": 8272
+   }
+  },
+  "symtvm_rev": {
+   "nonmanifold_fluid": 0,
+   "nonmanifold_solid": 0,
+   "fluid_volume_mm3": 76.18500008741438,
+   "solid_volume_mm3": 277.8149999125856,
+   "total_volume_mm3": 354.0,
+   "hemisphere_triangles": 123120,
+   "zone_files": 11,
+   "triangles": 365468,
+   "edge_use": {
+    "2": 535794,
+    "3": 8272
+   }
+  }
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "radius_mm": 0.1,
+ "spacing_mm": 0.4,
+ "rows_z_mm": [
+  0.85,
+  1.25,
+  1.65
+ ],
+ "per_stage_outer": 27,
+ "per_stage_island": 24,
+ "total_hemispheres_all_20_loops": 1026,
+ "min_gap_between_facing_hemispheres_mm": 0.10063859546417847,
+ "hemisphere_volume_share_of_fluid": 0.027478218697738012
+}

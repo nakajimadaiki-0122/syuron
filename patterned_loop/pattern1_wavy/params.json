@@ -1,0 +1,68 @@
+{
+ "source": "Xia et al. 2025 SYMTVM に本研究でループ内壁の波状パターンを追加",
+ "amplitude_mm": 0.05,
+ "target_pitch_mm": 0.4,
+ "walls": "both",
+ "pitch_used_mm": [
+  0.38832240431571585,
+  0.41073169735375464
+ ],
+ "plan_area_base_mm2": 52.1346112641164,
+ "plan_area_pattern_mm2": 52.134395251075546,
+ "wall_perimeter_base_mm": 317.82388687569886,
+ "wall_perimeter_pattern_mm": 336.70421024411627,
+ "min_gap_outer_to_island_mm": 0.20166599679164177,
+ "min_gap_outer_to_island_base_mm": 0.2998663302542797,
+ "max_abs_y_mm": 1.5616956959517876,
+ "curvature_radius_percentile_1_mm": 0.07812902691760702,
+ "models": {
+  "symtvm_fwd": {
+   "nonmanifold_fluid": 0,
+   "nonmanifold_solid": 0,
+   "fluid_volume_mm3": 78.20159287661349,
+   "solid_volume_mm3": 275.79840712338665,
+   "total_volume_mm3": 354.0000000000001,
+   "triangles": 336322,
+   "edge_use": {
+    "2": 478347,
+    "3": 17424
+   },
+   "min_triangle_height_mm": {
+    "inlet": 0.5729834691662549,
+    "outlet": 0.5729834691662549,
+    "fluid_top": 0.004119514228659295,
+    "fluid_bottom": 0.004118870542791928,
+    "fluid_walls": 0.011464531449830409,
+    "bottom_heat": 0.04696170541815277,
+    "solid_top": 0.004021399821984994,
+    "sym_left": 0.06524786053385949,
+    "sym_right": 0.06524786053385949,
+    "solid_ends": 0.027734973187953878
+   }
+  },
+  "symtvm_rev": {
+   "nonmanifold_fluid": 0,
+   "nonmanifold_solid": 0,
+   "fluid_volume_mm3": 78.20159287661336,
+   "solid_volume_mm3": 275.79840712338665,
+   "total_volume_mm3": 354.0,
+   "triangles": 337118,
+   "edge_use": {
+    "2": 479541,
+    "3": 17424
+   },
+   "min_triangle_height_mm": {
+    "inlet": 0.5729834691662549,
+    "outlet": 0.5729834691662549,
+    "fluid_top": 0.004117092392108622,
+    "fluid_bottom": 0.004119559890934057,
+    "fluid_walls": 0.011464531449830409,
+    "bottom_heat": 0.04696170541815277,
+    "solid_top": 0.004023287314712409,
+    "sym_left": 0.06524786053385949,
+    "sym_right": 0.06524786053385949,
+    "solid_ends": 0.027734973187953878
+   }
+  }
+ }
+}
